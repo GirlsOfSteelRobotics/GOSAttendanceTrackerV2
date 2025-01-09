@@ -1,1 +1,20 @@
-Hello World
+{% load static %}
+
+<!DOCTYPE html>
+<html lang='en'>
+<link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+<head>
+{% include "attendance/partial/calendar_script.html" with events=calendar_events %}
+</head>
+<body>
+
+{% include "attendance/partial/navbar.html" %}
+
+
+Welcome to the Girls of Steel attendance tracker. You can sign in <a href="{% url 'gos_signin' %}">here</a> or look at stats <a href="{% url 'gos_student_summary' %}">here</a>
+
+
+<div id='calendar'></div>
+
+</body>
+</html>

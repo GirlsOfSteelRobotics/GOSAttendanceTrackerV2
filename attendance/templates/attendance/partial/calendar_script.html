@@ -1,0 +1,40 @@
+
+<style>
+#calendar {
+  max-width: 1100px;
+  margin: 40px auto;
+}
+</style>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          },
+          events: [
+            {%  for att in events %}
+               {
+                 title: "{{ att.title }}",
+                {% if att.show_as_all_day %}
+                 allDay: "true",
+                {%  endif %}
+                 start: "{{  att.time_in|date:'Y-m-d\\TH:i:s'}}",
+               {%  if att.time_out %}
+                 end: "{{  att.time_out|date:'Y-m-d\\TH:i:s'}}",
+               {%  endif %}
+                {%  if att.color %}
+                   backgroundColor: "{{  att.color }}"
+                {%  endif %}
+               },
+            {% endfor %}
+          ]
+        });
+        calendar.render();
+      });
+
+    </script>

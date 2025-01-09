@@ -1,0 +1,20 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang='en'>
+<link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+<body>
+
+{% include "attendance/partial/navbar.html" %}
+
+<h1>People who are still signed in</h1>
+
+<h1> 3504 </h1>
+<table border="1">
+{% for student in gos_students %}
+    <tr><td>{{ student.full_name }}</td><td>{%  widthratio student.time_since_last_login.total_seconds 60 1 %} minutes</td></tr>
+{%  endfor  %}
+</table>
+
+</body>
+</html>
