@@ -2,12 +2,13 @@ import datetime
 from typing import Optional
 
 from django.db.models import Count
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import generic
 
 from attendance.models import GosStudent, GosAttendance
+
 
 class IndexView(generic.TemplateView):
     template_name = "attendance/index.html"
