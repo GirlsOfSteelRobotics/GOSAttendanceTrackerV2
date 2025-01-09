@@ -1,0 +1,35 @@
+name: Lint and Format
+
+on: [pull_request, push]
+
+jobs:
+  lint_python:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+
+      - name: Install Deps
+        run: pip3 install -r requirements.txt
+
+      - name: Run black
+        run: python3 -m black
+        if: always()
+
+      - name: Run PyFlake
+        run:  python3 -m autoflake $(git ls-files '*.py') --in-place --remove-unused-variable --remove-all-unused-imports
+        if: always()
+
+      - name: Check Output
+        run: git --no-pager diff --exit-code HEAD
+
+      - name: Generate diff
+        run: git diff HEAD > lint-fixes.patch
+        if: ${{ failure() }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: lint fixes
+          path: lint-fixes.patch
+        if: ${{ failure() }}
