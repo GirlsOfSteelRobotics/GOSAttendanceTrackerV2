@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 
 from attendance.models.mixins import InOutTimeMixin, AttendanceMixin
+from attendance.models.sheets_backend import GoogleSheetsBackend
 
 
 class GosStudent(models.Model, InOutTimeMixin):
@@ -31,12 +32,19 @@ class GosStudent(models.Model, InOutTimeMixin):
         return self.gosattendance_set
 
     def _log_in(self):
-        GosAttendance.objects.create(student=self, time_in=timezone.now())
+        attendance = GosAttendance.objects.create(student=self, time_in=timezone.now())
+        sheets_backend = GoogleSheetsBackend()
+        sheets_backend.gos_signin(
+            attendance.time_in, attendance.student.rfid, attendance.student.full_name()
+        )
 
     def _log_out(self):
         last_login = self.get_last_login()
         last_login.time_out = timezone.now()
         last_login.save()
+
+        sheets_backend = GoogleSheetsBackend()
+        sheets_backend.gos_signout(last_login.time_out, last_login.student.full_name())
 
     def _full_name(self):
         return self.full_name()
