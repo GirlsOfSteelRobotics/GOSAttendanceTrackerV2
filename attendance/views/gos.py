@@ -1,28 +1,9 @@
-import datetime
-from typing import Optional
-
-from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import generic
 
-from attendance.models import GosStudent, GosAttendance
-
-
-class IndexView(generic.TemplateView):
-    template_name = "attendance/index.html"
-
-    def get_context_data(self, **kwargs):
-        calendar_events = []
-
-        calendar_events.extend(
-            create_calendar_events_from_attendance(GosAttendance, "GOS", "blue")
-        )
-
-        context = super().get_context_data(**kwargs)
-        context["calendar_events"] = calendar_events
-        return context
+from attendance.models.gos import GosStudent
 
 
 class GosStudentSummaryView(generic.ListView):
@@ -92,55 +73,3 @@ def __gos_handle_login(request, student):
     request.session["result_msg"] = msg
     request.session["good_result"] = good_result
     return HttpResponseRedirect(reverse("gos_signin"))
-
-
-class ActiveManifest(generic.TemplateView):
-    template_name = "attendance/signed_in_list.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["gos_students"] = [
-            student for student in GosStudent.objects.all() if student.is_logged_in()
-        ]
-        return context
-
-
-class CalendarEvent:
-    def __init__(
-        self,
-        time_in: datetime.datetime,
-        time_out: Optional[datetime.datetime],
-        title: str,
-        color: Optional[str] = None,
-        show_as_all_day: bool = False,
-    ):
-        self.time_in = time_in
-        self.time_out = time_out
-        self.title = title
-        self.color = color
-        self.show_as_all_day = show_as_all_day
-
-    def __repr__(self):
-        return f"CalendarEvent - {type(self.time_in)}"
-
-
-def create_calendar_events_from_attendance(attendance_model, title, color):
-    visits = attendance_model.objects.values("time_in__date").annotate(
-        xyz=Count("time_in__date")
-    )
-
-    calendar_events = []
-    for att in visits:
-        calendar_events.append(
-            CalendarEvent(
-                time_in=datetime.datetime.fromisoformat(
-                    att["time_in__date"].isoformat()
-                ),
-                time_out=None,
-                title=f"{att['xyz']} " + title,
-                color=color,
-                show_as_all_day=True,
-            )
-        )
-
-    return calendar_events
