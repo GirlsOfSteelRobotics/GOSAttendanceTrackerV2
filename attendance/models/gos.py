@@ -18,17 +18,7 @@ class GosStudent(models.Model, InOutTimeMixin):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-    def num_meetings(self):
-        return len(self.gosattendance_set.all())
-
-    def num_hours(self):
-        total_time = sum(
-            [x.get_duration() for x in self.gosattendance_set.all()],
-            datetime.timedelta(),
-        )
-        return total_time.total_seconds() / 3600
-
-    def _attendance_model(self):
+    def _get_attendance_set(self):
         return self.gosattendance_set
 
     def _log_in(self):
@@ -37,14 +27,6 @@ class GosStudent(models.Model, InOutTimeMixin):
         sheets_backend.gos_signin(
             attendance.time_in, attendance.student.rfid, attendance.student.full_name()
         )
-
-    def _log_out(self):
-        last_login = self.get_last_login()
-        last_login.time_out = timezone.now()
-        last_login.save()
-
-        sheets_backend = GoogleSheetsBackend()
-        sheets_backend.gos_signout(last_login.time_out, last_login.student.full_name())
 
     def _full_name(self):
         return self.full_name()

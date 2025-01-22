@@ -1,20 +1,56 @@
 {% load static %}
 
-<!DOCTYPE html>
-<html lang='en'>
-<link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>GOS Attendance</title>
+
+    <link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'attendance/navbar.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+</head>
 <body>
 
-{% include "attendance/partial/navbar.html" %}
+<div class="container">
+
+{% include "attendance/shared/navbar.html" %}
 
 <h1>People who are still signed in</h1>
 
 <h1> 3504 </h1>
-<table border="1">
+<table class="table">
 {% for student in gos_students %}
-    <tr><td>{{ student.full_name }}</td><td>{%  widthratio student.time_since_last_login.total_seconds 60 1 %} minutes</td></tr>
+    <tr>
+        <td>{{ student.full_name }}</td>
+        <td>{%  widthratio student.time_since_last_login.total_seconds 60 1 %} minutes</td>
+    </tr>
 {%  endfor  %}
 </table>
+
+<h1>SCRA</h1>
+<table class="table">
+{% for visitor in scra_visitors %}
+    <tr>
+        <td>{{ visitor.full_name }}</td>
+        <td>{{ visitor.team_number }}</td>
+        <td>{%  widthratio visitor.time_since_last_login.total_seconds 60 1 %} minutes</td>
+    </tr>
+{%  endfor  %}
+</table>
+
+<h1>Field Builders</h1>
+<table class="table">
+{% for visitor in field_builders %}
+    <tr>
+        <td>{{ visitor.full_name }}</td>
+        <td>{%  widthratio visitor.time_since_last_login.total_seconds 60 1 %} minutes</td>
+    </tr>
+{%  endfor  %}
+</table>
+
+
+</div><!-- container //  -->
 
 </body>
 </html>

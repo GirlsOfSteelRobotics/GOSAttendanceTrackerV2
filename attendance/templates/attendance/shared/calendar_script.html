@@ -22,13 +22,13 @@
                  title: "{{ att.title }}",
                 {% if att.show_as_all_day %}
                  allDay: "true",
-                {%  endif %}
+                {% endif %}
                  start: "{{  att.time_in|date:'Y-m-d\\TH:i:s'}}",
                {%  if att.time_out %}
                  end: "{{  att.time_out|date:'Y-m-d\\TH:i:s'}}",
                {%  endif %}
                 {%  if att.color %}
-                   backgroundColor: "{{  att.color }}"
+                 backgroundColor: "{{  att.color }}"
                 {%  endif %}
                },
             {% endfor %}

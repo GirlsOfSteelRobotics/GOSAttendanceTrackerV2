@@ -8,10 +8,12 @@ from attendance.models.gos import GosStudent
 
 class GosStudentSummaryView(generic.ListView):
     model = GosStudent
+    template_name = "attendance/gos/gosstudent_list.html"
 
 
 class GosStudentDetailView(generic.DetailView):
     model = GosStudent
+    template_name = "attendance/gos/gosstudent_detail.html"
     slug_url_kwarg = "rfid"
     slug_field = "rfid"
 
@@ -22,7 +24,7 @@ class GosStudentDetailView(generic.DetailView):
 
 
 def gos_signin(request):
-    return render(request, "attendance/gosattendance_signin.html")
+    return render(request, "attendance/gos/signin.html")
 
 
 def gos_log_attendance_rfid(request):
@@ -30,7 +32,7 @@ def gos_log_attendance_rfid(request):
     students = GosStudent.objects.filter(rfid=rfid)
     if not students:
         return __login_failure_redirect(
-            request, f"Invalid rfid name {rfid}", "attendance/gosattendance_signin.html"
+            request, f"Invalid rfid name {rfid}", "attendance/signin.html"
         )
 
     return __gos_handle_login(request, students[0])
@@ -43,7 +45,7 @@ def gos_log_attendance_name(request):
         return __login_failure_redirect(
             request,
             f"Invalid student name {full_name}, could not split the name into two parts",
-            "attendance/gosattendance_signin.html",
+            "attendance/signin.html",
         )
 
     first_name, last_name = name_parts
@@ -52,7 +54,7 @@ def gos_log_attendance_name(request):
         return __login_failure_redirect(
             request,
             f"Invalid student name {full_name}",
-            "attendance/gosattendance_signin.html",
+            "attendance/signin.html",
         )
 
     return __gos_handle_login(request, students[0])
