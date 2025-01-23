@@ -15,6 +15,20 @@
 			  <li><a class="dropdown-item" href="{% url 'gos_student_summary' %}"> Overview </a></li>
 		    </ul>
 		</li>
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">  SCRA Visitors  </a>
+		    <ul class="dropdown-menu">
+			  <li><a class="dropdown-item" href="{% url 'scra_signin' %}"> Sign In </a></li>
+			  <li><a class="dropdown-item" href="{% url 'scra_visitor_list' %}"> View Attendance </a></li>
+		    </ul>
+		</li>
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">  Field Builders  </a>
+		    <ul class="dropdown-menu">
+			  <li><a class="dropdown-item" href="{% url 'field_builders_signin' %}"> Sign In </a></li>
+			  <li><a class="dropdown-item" href="{% url 'field_builders_list' %}"> View Attendance </a></li>
+		    </ul>
+		</li>
       <li class="nav-item"><a class="nav-link" href="{% url 'active_manifest' %}">Logged In</a></li>
 
 	</ul>

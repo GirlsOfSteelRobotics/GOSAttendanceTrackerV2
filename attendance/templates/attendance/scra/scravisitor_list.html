@@ -1,0 +1,38 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>GOS Attendance</title>
+
+    <link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'attendance/navbar.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+{% include "attendance/shared/calendar_script.html" with events=calendar_events %}
+</head>
+<body>
+
+<div class="container">
+
+{% include "attendance/shared/navbar.html" %}
+
+<div id='calendar'></div>
+
+<h1>Scra Visitors</h1>
+
+{% autoescape off %}
+{% for plot in plots %}
+{{plot}}
+{% endfor %}
+{% endautoescape %}
+
+{%  for team_number, team_visitors in teams.items %}
+<h2 id="{{ team_number }}">{{ team_number }}</h2>
+{% include "attendance/scra/sub_templates/visitor_table.html" with visitors=team_visitors %}
+{% endfor %}
+
+</div><!-- container //  -->
+
+</body>
+</html>

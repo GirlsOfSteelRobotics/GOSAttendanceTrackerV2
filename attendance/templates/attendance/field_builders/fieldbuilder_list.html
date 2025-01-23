@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>GOS Attendance</title>
+
+    <link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'attendance/navbar.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+{% include "attendance/shared/calendar_script.html" with events=calendar_events %}
+</head>
+<body>
+
+<div class="container">
+
+{% include "attendance/shared/navbar.html" %}
+
+<div id='calendar'></div>
+
+<table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Num Meetings</th>
+        <th>Hours Logged</th>
+      </tr>
+    </thead>
+    <tbody>
+{% for field_builder in field_builders %}
+    <tr>
+        <td>{{ field_builder.full_name }}</td>
+        <td>{{ field_builder.num_meetings }}</td>
+        <td>{{ field_builder.num_hours|floatformat:2 }}</td>
+    </tr>
+{%  endfor %}
+    </tbody>
+</table>
+
+</div><!-- container //  -->
+
+</body>
+</html>
