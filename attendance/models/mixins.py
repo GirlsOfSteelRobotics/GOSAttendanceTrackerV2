@@ -6,10 +6,12 @@ from django.db import models
 from django.utils import timezone
 
 
+CROSS_POST_LOGINS = True
+
+
 class InOutTimeMixin:
-    def is_logged_in(self):
+    def is_logged_in(self) -> bool:
         active_time = self.time_since_last_login()
-        print(active_time)
         if active_time is None:
             return False
 
@@ -29,7 +31,7 @@ class InOutTimeMixin:
         return delta
 
     def get_last_login(self):
-        logins = self._attendance_model().order_by("-time_in")
+        logins = self._get_attendance_set().order_by("-time_in")
         if logins.count() > 0:
             return logins[0]
         return None
@@ -54,14 +56,41 @@ class InOutTimeMixin:
                 self._log_out()
                 good_result = True
         else:
-            self._log_in()
+            new_attendance = self._log_in()
+            if CROSS_POST_LOGINS:
+                from attendance.models.sheets_backend import GoogleSheetsBackend
+
+                sheets_backend = GoogleSheetsBackend()
+                sheets_backend.signin(new_attendance)
+
             msg = f"{username} Logged in"
             good_result = True
 
         return msg, good_result
 
+    def num_meetings(self):
+        return len(self._get_attendance_set().all())
+
+    def num_hours(self):
+        total_time = sum(
+            [x.get_duration() for x in self._get_attendance_set().all()],
+            datetime.timedelta(),
+        )
+        return total_time.total_seconds() / 3600
+
+    def _log_out(self):
+        last_login = self.get_last_login()
+        last_login.time_out = timezone.now()
+        last_login.save()
+
+        if CROSS_POST_LOGINS:
+            from attendance.models.sheets_backend import GoogleSheetsBackend
+
+            sheets_backend = GoogleSheetsBackend()
+            sheets_backend.signout(last_login)
+
     @abc.abstractmethod
-    def _attendance_model(self):
+    def _get_attendance_set(self):
         raise NotImplementedError()
 
     @abc.abstractmethod
@@ -69,11 +98,7 @@ class InOutTimeMixin:
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def _log_out(self):
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def _full_name(self):
+    def _full_name(self) -> str:
         raise NotImplementedError()
 
 

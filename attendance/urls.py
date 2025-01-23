@@ -1,6 +1,8 @@
 from django.urls import path
 
 from .views import gos
+from .views import field_builders
+from .views import scra
 from .views import top_level
 
 urlpatterns = [
@@ -22,5 +24,33 @@ urlpatterns = [
         "gos/<int:rfid>/",
         gos.GosStudentDetailView.as_view(),
         name="gos_student_detail",
+    ),
+    # SCRA
+    path("scra/signin", scra.ScraSignin.as_view(), name="scra_signin"),
+    path(
+        "scra/log_attendance",
+        scra.scra_log_attendance,
+        name="scra_log_attendance",
+    ),
+    path(
+        "scra",
+        scra.ScraVisitorList.as_view(),
+        name="scra_visitor_list",
+    ),
+    # Field Builders
+    path(
+        "field_builders",
+        field_builders.FieldBuilderList.as_view(),
+        name="field_builders_list",
+    ),
+    path(
+        "field_builders/signin",
+        field_builders.FieldBuildersSignin.as_view(),
+        name="field_builders_signin",
+    ),
+    path(
+        "field_builders/log_attendance",
+        field_builders.field_builders_log_attendance,
+        name="field_builders_log_attendance",
     ),
 ]

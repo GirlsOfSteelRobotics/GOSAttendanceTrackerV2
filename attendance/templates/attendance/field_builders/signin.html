@@ -1,0 +1,42 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>GOS Attendance</title>
+
+    <link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'attendance/navbar.js' %}"></script>
+    <script src="{% static 'attendance/redirect_to_gos_signin_on_idle.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+    <script>
+setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
+    </script>
+</head>
+<body>
+
+<div class="container">
+
+{% include "attendance/shared/navbar.html" %}
+
+
+<form action="{% url 'field_builders_log_attendance' %}" method="post">
+{% csrf_token %}
+    <legend><h1>Sign In as a Field Builder</h1></legend>
+        <label class="form-label" for="full_name">Full Name</label>
+        <input class="form-control" id="full_name" name="full_name" list="field_builders" placeholder="Full Name" required>
+        <datalist id="field_builders">
+            {%  for buildier in field_builders %}
+            <option value="{{ buildier.full_name }}">{{ buildier.full_name }}</option>
+            {%  endfor %}
+        </datalist>
+<input type="submit" value="Sign In">
+</form>
+
+<p id="status_msg" style="{%  if request.session.good_result %}color: green {%  else %} color: red {% endif %}">{{ request.session.result_msg }}</p>
+
+</div><!-- container //  -->
+
+</body>
+</html>

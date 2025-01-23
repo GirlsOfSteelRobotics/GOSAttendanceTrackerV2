@@ -1,7 +1,7 @@
 {% load static %}
 
-<!DOCTYPE html>
-<html lang='en'>
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
     <title>GOS Attendance</title>
 
@@ -17,9 +17,26 @@
 
 {% include "attendance/shared/navbar.html" %}
 
-Welcome to the Girls of Steel attendance tracker. You can sign in <a href="{% url 'gos_signin' %}">here</a> or look at stats <a href="{% url 'gos_student_summary' %}">here</a>
-
 <div id='calendar'></div>
+
+<table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Num Meetings</th>
+        <th>Hours Logged</th>
+      </tr>
+    </thead>
+    <tbody>
+{% for field_builder in field_builders %}
+    <tr>
+        <td>{{ field_builder.full_name }}</td>
+        <td>{{ field_builder.num_meetings }}</td>
+        <td>{{ field_builder.num_hours|floatformat:2 }}</td>
+    </tr>
+{%  endfor %}
+    </tbody>
+</table>
 
 </div><!-- container //  -->
 

@@ -1,0 +1,74 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>GOS Attendance</title>
+
+    <link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'attendance/navbar.js' %}"></script>
+    <script src="{% static 'attendance/redirect_to_gos_signin_on_idle.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+    <script>
+setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
+
+
+team_visitors = {
+{%  for team, visitors in teams.items %}
+     "{{ team }}":[{% for visitor in visitors %}"{{ visitor.full_name }}", {%  endfor %}],
+{% endfor %}
+};
+
+function update_list(){
+    console.log("Updating list...")
+    var team_number = document.getElementById("team_number").value;
+    console.log(team_number)
+    console.log(team_visitors[team_number])
+
+    var datalist = document.getElementById("team_members_list")
+
+    if (team_visitors[team_number] === undefined) {
+        console.log("CLEARNING")
+        datalist.innerHTML = '';
+    } else {
+        datalist.innerHTML = ''
+        for (const team_member of team_visitors[team_number]) {
+            datalist.innerHTML += '<option value="' + team_member + '">' + team_member + '</option>'
+        }
+    }
+
+}
+
+    </script>
+</head>
+<body>
+
+<div class="container">
+
+{% include "attendance/shared/navbar.html" %}
+
+
+<form action="{% url 'scra_log_attendance' %}" method="post">
+{% csrf_token %}
+    <legend><h1>Sign In as a SCRA Visitor</h1></legend>
+        <label class="form-label" for="team_number">Team Number</label>
+        <input class="form-control" type="number" id="team_number" name="team_number" list=team_numbers_list placeholder="Team Number" autofocus="autofocus" onchange="update_list()" required>
+        <datalist id="team_numbers_list">
+            {%  for team_number in teams %}
+            <option value="{{ team_number }}">{{ team_number }}</option>
+            {%  endfor %}
+        </datalist>
+        <label class="form-label" for="full_name">Full Name</label>
+        <input class="form-control" id="full_name" name="full_name" list="team_members_list" placeholder="Full Name" required>
+        <datalist id="team_members_list">
+        </datalist>
+<input type="submit" value="Sign In">
+</form>
+
+<p id="status_msg" style="{%  if request.session.good_result %}color: green {%  else %} color: red {% endif %}">{{ request.session.result_msg }}</p>
+
+</div><!-- container //  -->
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+
+<table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Num Meetings</th>
+        <th>Hours Logged</th>
+      </tr>
+    </thead>
+    <tbody>
+{% for student in students %}
+    <tr>
+        <td><a href="{% url 'gos_student_detail' student.rfid %}">{{ student.full_name }}</a></td>
+        <td>{{ student.num_meetings }}</td>
+        <td>{{ student.num_hours|floatformat:2 }}</td>
+    </tr>
+{%  endfor %}
+    </tbody>
+</table>

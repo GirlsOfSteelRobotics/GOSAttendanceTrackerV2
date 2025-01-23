@@ -1,7 +1,7 @@
 {% load static %}
 
-<!DOCTYPE html>
-<html lang='en'>
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
     <title>GOS Attendance</title>
 
@@ -17,9 +17,20 @@
 
 {% include "attendance/shared/navbar.html" %}
 
-Welcome to the Girls of Steel attendance tracker. You can sign in <a href="{% url 'gos_signin' %}">here</a> or look at stats <a href="{% url 'gos_student_summary' %}">here</a>
-
 <div id='calendar'></div>
+
+<h1>Scra Visitors</h1>
+
+{% autoescape off %}
+{% for plot in plots %}
+{{plot}}
+{% endfor %}
+{% endautoescape %}
+
+{%  for team_number, team_visitors in teams.items %}
+<h2 id="{{ team_number }}">{{ team_number }}</h2>
+{% include "attendance/scra/sub_templates/visitor_table.html" with visitors=team_visitors %}
+{% endfor %}
 
 </div><!-- container //  -->
 
