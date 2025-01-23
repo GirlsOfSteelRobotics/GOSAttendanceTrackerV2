@@ -6,6 +6,9 @@ from django.db import models
 from django.utils import timezone
 
 
+CROSS_POST_LOGINS = True
+
+
 class InOutTimeMixin:
     def is_logged_in(self) -> bool:
         active_time = self.time_since_last_login()
@@ -53,7 +56,13 @@ class InOutTimeMixin:
                 self._log_out()
                 good_result = True
         else:
-            self._log_in()
+            new_attendance = self._log_in()
+            if CROSS_POST_LOGINS:
+                from attendance.models.sheets_backend import GoogleSheetsBackend
+
+                sheets_backend = GoogleSheetsBackend()
+                sheets_backend.signin(new_attendance)
+
             msg = f"{username} Logged in"
             good_result = True
 
@@ -73,6 +82,12 @@ class InOutTimeMixin:
         last_login = self.get_last_login()
         last_login.time_out = timezone.now()
         last_login.save()
+
+        if CROSS_POST_LOGINS:
+            from attendance.models.sheets_backend import GoogleSheetsBackend
+
+            sheets_backend = GoogleSheetsBackend()
+            sheets_backend.signout(last_login)
 
     @abc.abstractmethod
     def _get_attendance_set(self):
