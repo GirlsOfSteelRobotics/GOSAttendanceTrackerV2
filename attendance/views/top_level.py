@@ -1,6 +1,11 @@
 from django.views import generic
 
-from attendance.models import ScraVisitorAttendance, FieldBuilderAttendance, ScraVisitor, FieldBuilder
+from attendance.models import (
+    ScraVisitorAttendance,
+    FieldBuilderAttendance,
+    ScraVisitor,
+    FieldBuilder,
+)
 from attendance.models.gos import GosStudent, GosAttendance
 from attendance.views.utils import create_calendar_events_from_attendance
 
