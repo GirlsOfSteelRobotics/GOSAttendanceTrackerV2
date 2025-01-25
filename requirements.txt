@@ -4,3 +4,4 @@ black~=24.10.0
 dj-database-url==2.1.0
 gspread==6.1.2
 psycopg2~=2.9.10
+pytz~=2024.2
