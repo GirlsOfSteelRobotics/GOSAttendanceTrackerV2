@@ -32,7 +32,7 @@ def gos_log_attendance_rfid(request):
     students = GosStudent.objects.filter(rfid=rfid)
     if not students:
         return __login_failure_redirect(
-            request, f"Invalid rfid name {rfid}", "attendance/signin.html"
+            request, f"Invalid rfid name {rfid}", "attendance/gos/signin.html"
         )
 
     return __gos_handle_login(request, students[0])
@@ -45,7 +45,7 @@ def gos_log_attendance_name(request):
         return __login_failure_redirect(
             request,
             f"Invalid student name {full_name}, could not split the name into two parts",
-            "attendance/signin.html",
+            "attendance/gos/signin.html",
         )
 
     first_name, last_name = name_parts
@@ -54,7 +54,7 @@ def gos_log_attendance_name(request):
         return __login_failure_redirect(
             request,
             f"Invalid student name {full_name}",
-            "attendance/signin.html",
+            "attendance/gos/signin.html",
         )
 
     return __gos_handle_login(request, students[0])
