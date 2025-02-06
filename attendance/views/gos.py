@@ -17,11 +17,6 @@ class GosStudentDetailView(generic.DetailView):
     slug_url_kwarg = "rfid"
     slug_field = "rfid"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["attendance"] = []
-        return context
-
 
 def gos_signin(request):
     return render(request, "attendance/gos/signin.html")
@@ -29,10 +24,17 @@ def gos_signin(request):
 
 def gos_log_attendance_rfid(request):
     rfid = request.POST["rfid"]
+    try:
+        rfid = int(rfid)
+    except ValueError:
+        return __login_failure_redirect(
+            request, f"Invalid rfid '{rfid}'", "attendance/gos/signin.html"
+        )
+
     students = GosStudent.objects.filter(rfid=rfid)
     if not students:
         return __login_failure_redirect(
-            request, f"Invalid rfid name {rfid}", "attendance/gos/signin.html"
+            request, f"No student found with RFID {rfid}", "attendance/gos/signin.html"
         )
 
     return __gos_handle_login(request, students[0])

@@ -19,7 +19,7 @@ class CalendarEvent:
         self.color = color
         self.show_as_all_day = show_as_all_day
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return f"CalendarEvent - {type(self.time_in)}"
 
 

@@ -9,6 +9,11 @@ from django.utils import timezone
 CROSS_POST_LOGINS = True
 
 
+def set_cross_post_login(new_val):
+    global CROSS_POST_LOGINS
+    CROSS_POST_LOGINS = new_val
+
+
 class InOutTimeMixin:
     def is_logged_in(self) -> bool:
         active_time = self.time_since_last_login()
@@ -57,7 +62,7 @@ class InOutTimeMixin:
                 good_result = True
         else:
             new_attendance = self._log_in()
-            if CROSS_POST_LOGINS:
+            if CROSS_POST_LOGINS:  # pragma: no cover
                 from attendance.models.sheets_backend import GoogleSheetsBackend
 
                 sheets_backend = GoogleSheetsBackend()
@@ -83,22 +88,22 @@ class InOutTimeMixin:
         last_login.time_out = timezone.now()
         last_login.save()
 
-        if CROSS_POST_LOGINS:
+        if CROSS_POST_LOGINS:  # pragma: no cover
             from attendance.models.sheets_backend import GoogleSheetsBackend
 
             sheets_backend = GoogleSheetsBackend()
             sheets_backend.signout(last_login)
 
     @abc.abstractmethod
-    def _get_attendance_set(self):
+    def _get_attendance_set(self):  # pragma: no cover
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def _log_in(self):
+    def _log_in(self):  # pragma: no cover
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def _full_name(self) -> str:
+    def _full_name(self) -> str:  # pragma: no cover
         raise NotImplementedError()
 
 
