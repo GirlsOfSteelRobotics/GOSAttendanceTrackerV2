@@ -42,6 +42,10 @@ class FieldBuildersSignin(generic.TemplateView):
 
 def field_builders_log_attendance(request):
     full_name = request.POST["full_name"].strip()
+    if len(full_name) == 0:
+        request.session["result_msg"] = "You must enter a full name."
+        request.session["good_result"] = False
+        return HttpResponseRedirect(reverse("field_builders_signin"))
 
     fb, is_new = FieldBuilder.objects.get_or_create(full_name=full_name)
 

@@ -9,7 +9,7 @@ class GosStudent(models.Model, InOutTimeMixin):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.full_name()
 
     def full_name(self):
@@ -29,5 +29,5 @@ class GosAttendance(AttendanceMixin):
     student = models.ForeignKey(GosStudent, on_delete=models.CASCADE)
     purpose = models.CharField(max_length=100)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return f"{self.student} {self.time_in}-{self.time_out}"

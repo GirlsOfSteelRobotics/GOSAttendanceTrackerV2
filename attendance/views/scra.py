@@ -69,6 +69,10 @@ class ScraVisitorList(generic.TemplateView):
 def scra_log_attendance(request):
     team_number = int(request.POST["team_number"])
     full_name = request.POST["full_name"].strip()
+    if len(full_name) == 0:
+        request.session["result_msg"] = "You must enter a full name."
+        request.session["good_result"] = False
+        return HttpResponseRedirect(reverse("scra_signin"))
 
     scra_user, is_new = ScraVisitor.objects.get_or_create(
         team_number=team_number, full_name=full_name

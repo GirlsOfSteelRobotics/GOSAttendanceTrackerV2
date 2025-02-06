@@ -8,7 +8,7 @@ class FieldBuilder(models.Model, InOutTimeMixin):
     full_name = models.CharField(max_length=100)
     forms_completed = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.full_name
 
     def _get_attendance_set(self):
@@ -26,5 +26,5 @@ class FieldBuilder(models.Model, InOutTimeMixin):
 class FieldBuilderAttendance(AttendanceMixin):
     field_builder = models.ForeignKey(FieldBuilder, on_delete=models.CASCADE)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return f"{self.field_builder.full_name}: {self.time_in} - {self.time_out}"

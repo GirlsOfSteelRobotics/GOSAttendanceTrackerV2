@@ -8,7 +8,7 @@ class ScraVisitor(models.Model, InOutTimeMixin):
     full_name = models.CharField(max_length=100)
     team_number = models.IntegerField()
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return f"{self.full_name} - {self.team_number}"
 
     def _get_attendance_set(self):
@@ -27,5 +27,5 @@ class ScraVisitorAttendance(AttendanceMixin):
     scra_visitor = models.ForeignKey(ScraVisitor, on_delete=models.CASCADE)
     purpose = models.CharField(max_length=100)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return f"{self.scra_visitor.full_name}: {self.time_in} - {self.time_out}"

@@ -6,7 +6,6 @@ from django.utils import timezone
 from attendance.models import GosAttendance, GosStudent
 
 
-# Create your tests here.
 class AttendanceTest(TestCase):
 
     def test_log_in(self):
@@ -45,3 +44,18 @@ class AttendanceTest(TestCase):
             student=student, time_in=t - datetime.timedelta(minutes=1), time_out=None
         )
         self.assertTrue(student.is_logged_in())
+
+    def test_debounce_login(self):
+        student = GosStudent.objects.create(
+            rfid=3504, first_name="Test", last_name="User"
+        )
+        self.assertFalse(student.is_logged_in())
+
+        now = timezone.now()
+        GosAttendance.objects.create(
+            student=student, time_in=now - datetime.timedelta(seconds=1), time_out=None
+        )
+        msg, is_good = student.handle_signin_attempt()
+
+        self.assertTrue("Test User tapped twice in" in msg)
+        self.assertFalse(is_good)
