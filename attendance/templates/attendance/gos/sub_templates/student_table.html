@@ -7,6 +7,10 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>Grade</th>
+        <th>Program</th>
+        <th>Preseason Crew</th>
+        <th>Subteam</th>
         <th>Num Meetings</th>
         <th>Hours Logged</th>
       </tr>
@@ -15,6 +19,10 @@
 {% for student in students %}
     <tr>
         <td><a href="{% url 'gos_student_detail' student.rfid %}">{{ student.full_name }}</a></td>
+        <td>{{ student.grade }}</td>
+        <td>{{ student.gos_program }}</td>
+        <td>{{ student.preseason_crew }}</td>
+        <td>{{ student.subteam }}</td>
         <td>{{ student.num_meetings }}</td>
         <td>{{ student.num_hours|floatformat:2 }}</td>
     </tr>

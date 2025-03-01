@@ -22,9 +22,17 @@ class ScraSignin(generic.TemplateView):
         teams_data = {}
         for fields in team_numbers:
             team_number = fields["team_number"]
-            teams_data[team_number] = ScraVisitor.objects.filter(
-                team_number=team_number
+            teams_data[team_number] = list(
+                ScraVisitor.objects.filter(team_number=team_number)
             )
+            # TODO filter bad names on creation, not here
+            bad_names = []
+            for visitor in teams_data[team_number]:
+                if "\\" in visitor.full_name or '"' in visitor.full_name:
+                    bad_names.append(visitor)
+
+            for bad_name in bad_names:
+                teams_data[team_number].remove(bad_name)
 
         context = {}
         context["teams"] = teams_data
