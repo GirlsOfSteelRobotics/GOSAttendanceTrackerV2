@@ -33,7 +33,7 @@ setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 500
 {% csrf_token %}
     <legend><h1>Sign In with Full Name</h1></legend>
         <label for="full_name">Full Name</label>
-        <input id="full_name" name="full_name">
+        <input id="full_name" name="full_name" autocomplete="off" aria-autocomplete="none">
 <input type="submit" value="Sign In">
 </form>
 
