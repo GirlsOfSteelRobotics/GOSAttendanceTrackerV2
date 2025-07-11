@@ -10,6 +10,8 @@
     <script src="{% static 'attendance/navbar.js' %}"></script>
     <script src="{% static 'attendance/redirect_to_gos_signin_on_idle.js' %}"></script>
     <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'attendance/attendance.css' %}">
+
     <script>
 setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
 
@@ -44,26 +46,54 @@ function update_list(){
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="scra">
 
 {% include "attendance/shared/navbar.html" %}
 
+<div class="col-md-12">
+    <img src="{% static 'scra_logo.png' %}" class="img-fluid mx-auto d-block" alt="SCRA Logo" />
+</div>
 
 <form action="{% url 'scra_log_attendance' %}" method="post">
 {% csrf_token %}
-    <legend><h1>Sign In as a SCRA Visitor</h1></legend>
-        <label class="form-label" for="team_number">Team Number</label>
-        <input class="form-control" type="number" id="team_number" name="team_number" list=team_numbers_list placeholder="Team Number" autofocus="autofocus" onchange="update_list()" required>
-        <datalist id="team_numbers_list">
-            {%  for team_number in teams %}
-            <option value="{{ team_number }}">{{ team_number }}</option>
-            {%  endfor %}
-        </datalist>
-        <label class="form-label" for="full_name">Full Name</label>
-        <input class="form-control" id="full_name" name="full_name" list="team_members_list" placeholder="Full Name" autocomplete="off" required>
-        <datalist id="team_members_list">
-        </datalist>
-<input type="submit" value="Sign In">
+    <div class="row">
+        <div class="col-12">
+            <legend><h1>Sign In as a SCRA Visitor</h1></legend>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="form-label" for="team_number">Team Number</label>
+        </div>
+        <div class="col-md-10">
+            <input class="form-control" type="number" id="team_number" name="team_number" list=team_numbers_list placeholder="Team Number" autofocus="autofocus" onchange="update_list()" required>
+            <datalist id="team_numbers_list">
+                {%  for team_number in teams %}
+                    <option value="{{ team_number }}">{{ team_number }}</option>
+                {%  endfor %}
+            </datalist>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-2">
+            <label class="form-label" for="full_name">Full Name</label>
+        </div>
+
+        <div class="col-md-10">
+            <input class="form-control" id="full_name" name="full_name" list="team_members_list" placeholder="Full Name" autocomplete="off" required>
+            <datalist id="team_members_list">
+            </datalist>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <input type="submit" value="Sign In">
+        </div>
+    </div>
 </form>
 
 <p id="status_msg" style="{%  if request.session.good_result %}color: green {%  else %} color: red {% endif %}">{{ request.session.result_msg }}</p>
