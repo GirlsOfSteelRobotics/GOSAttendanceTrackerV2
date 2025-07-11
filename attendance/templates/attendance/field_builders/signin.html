@@ -16,14 +16,18 @@
 setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
     </script>
 </head>
-<body>
-
-<div class="container" id="field">
+<body id="field">
 
 {% include "attendance/shared/navbar.html" %}
 
-<div class="col-md-12">
-    <img src="{% static 'field_logo.png' %}" class="img-fluid mx-auto d-block" alt="SCRA Logo" />
+<div class="container">
+
+<div class="row text-center row-cols-6">
+    <div class="col">&nbsp;</div>
+    <div class="col-8">
+        <img src="{% static 'field_logo.png' %}" class="img-fluid mx-auto d-block" alt="Field image"/>
+    </div>
+    <div class="col">&nbsp;</div>
 </div>
 
 <form action="{% url 'field_builders_log_attendance' %}" method="post">

@@ -14,16 +14,19 @@
 setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
     </script>
 </head>
-<body>
-
-<div class="container" id="gos">
+<body id="gos">
 
 {% include "attendance/shared/navbar.html" %}
+<div class="container">
 
-<div class="col-md-12">
-    <img src="{% static 'gos_logo3.png' %}" class="img-fluid mx-auto" alt="GOS Logo" />
+<div class="row text-center row-cols-6">
+    <div class="col">&nbsp;</div>
+    <div class="col-8">
+        <img src="{% static 'gos_logo3.png' %}" class="img-fluid mx-auto d-block" alt="GOS Logo"/>
+    </div>
+    <div class="col">&nbsp;</div>
 </div>
-    
+
 <form class="row g-3" action="{% url 'gos_log_attendance_rfid' %}" method="post">
 {% csrf_token %}
     <div class="col-12">

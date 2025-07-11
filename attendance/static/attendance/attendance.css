@@ -1,19 +1,19 @@
 body {
-    background-color: #808080;
+    background-color: dimgray;
 }
 
-#gos.container {
+body#gos {
     background-color: #bad3fe;
     color: black;
 }
 
 
-#scra.container {
+body#scra {
     background-color: gold;
     color: black;
 }
 
 
-#field.container {
+body#field {
     background-color: darkblue;
 }
