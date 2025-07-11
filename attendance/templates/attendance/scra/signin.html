@@ -44,14 +44,18 @@ function update_list(){
 
     </script>
 </head>
-<body>
-
-<div class="container" id="scra">
+<body id="scra">
 
 {% include "attendance/shared/navbar.html" %}
 
-<div class="col-md-12">
-    <img src="{% static 'scra_logo.png' %}" class="img-fluid mx-auto d-block" alt="SCRA Logo" />
+<div class="container">
+
+<div class="row text-center row-cols-4">
+    <div class="col">&nbsp;</div>
+    <div class="col-6">
+        <img src="{% static 'scra_logo.png' %}" class="img-fluid mx-auto d-block" alt="SCRA Logo" width="80%"/>
+    </div>
+    <div class="col">&nbsp;</div>
 </div>
 
 <form action="{% url 'scra_log_attendance' %}" method="post">
