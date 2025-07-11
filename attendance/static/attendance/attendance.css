@@ -1,0 +1,19 @@
+body {
+    background-color: #808080;
+}
+
+#gos.container {
+    background-color: #bad3fe;
+    color: black;
+}
+
+
+#scra.container {
+    background-color: gold;
+    color: black;
+}
+
+
+#field.container {
+    background-color: darkblue;
+}

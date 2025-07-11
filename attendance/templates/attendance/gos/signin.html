@@ -9,32 +9,54 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="{% static 'attendance/navbar.js' %}"></script>
     <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'attendance/attendance.css' %}">
     <script>
 setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
     </script>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="gos">
 
 {% include "attendance/shared/navbar.html" %}
 
-<form action="{% url 'gos_log_attendance_rfid' %}" method="post">
+<div class="col-md-12">
+    <img src="{% static 'gos_logo3.png' %}" class="img-fluid mx-auto" alt="GOS Logo" />
+</div>
+    
+<form class="row g-3" action="{% url 'gos_log_attendance_rfid' %}" method="post">
 {% csrf_token %}
-    <legend><h1>Sign In with RFID</h1></legend>
-        <label for="rfid">RFID</label>
-        <input type="number" id="rfid" name="rfid" autofocus="autofocus">
-<input type="submit" value="Sign In">
+    <div class="col-12">
+        <legend><h1>Sign In with RFID</h1></legend>
+    </div>
+    <div class="col-md-2">
+        <label for="rfid" class="form-label">RFID</label>
+    </div>
+    <div class="col-md-8">
+        <input type="number" id="rfid" name="rfid" class="form-control" autofocus="autofocus" autocomplete="off" aria-autocomplete="none">
+    </div>
+    <div class="col-md-2">
+        <input type="submit" value="Sign In" class="btn btn-primary">
+    </div>
 </form>
 
 <br><br>
 
-<form action="{% url 'gos_log_attendance_name' %}" method="post">
+<form class="row g-3" action="{% url 'gos_log_attendance_name' %}" method="post">
 {% csrf_token %}
-    <legend><h1>Sign In with Full Name</h1></legend>
-        <label for="full_name">Full Name</label>
-        <input id="full_name" name="full_name" autocomplete="off" aria-autocomplete="none">
-<input type="submit" value="Sign In">
+    <div class="col-12">
+        <legend><h1>Sign In with Full Name</h1></legend>
+    </div>
+    <div class="col-md-2">
+        <label for="full_name" class="form-label">Full Name</label>
+    </div>
+    <div class="col-md-8">
+        <input id="full_name" name="full_name" class="form-control" autocomplete="off" aria-autocomplete="none">
+    </div>
+    <div class="col-md-2">
+        <input type="submit" value="Sign In" class="btn btn-primary">
+    </div>
+
 </form>
 
 <p id="status_msg" style="{%  if request.session.good_result %}color: green {%  else %} color: red {% endif %}">{{ request.session.result_msg }}</p>

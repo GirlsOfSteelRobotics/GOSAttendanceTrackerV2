@@ -10,31 +10,53 @@
     <script src="{% static 'attendance/navbar.js' %}"></script>
     <script src="{% static 'attendance/redirect_to_gos_signin_on_idle.js' %}"></script>
     <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'attendance/attendance.css' %}">
+
     <script>
 setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
     </script>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="field">
 
 {% include "attendance/shared/navbar.html" %}
 
+<div class="col-md-12">
+    <img src="{% static 'field_logo.png' %}" class="img-fluid mx-auto d-block" alt="SCRA Logo" />
+</div>
 
 <form action="{% url 'field_builders_log_attendance' %}" method="post">
 {% csrf_token %}
-    <legend><h1>Sign In as a Field Builder</h1></legend>
-        <label class="form-label" for="full_name">Full Name</label>
-        <input class="form-control" id="full_name" name="full_name" list="field_builders" placeholder="Full Name" required>
-        <datalist id="field_builders">
-            {%  for buildier in field_builders %}
-            <option value="{{ buildier.full_name }}">{{ buildier.full_name }}</option>
-            {%  endfor %}
-        </datalist>
-<input type="submit" value="Sign In">
+
+    <div class="row">
+        <div class="col-12">
+            <legend><h1>Sign In as a Field Builder</h1></legend>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <label class="form-label" for="full_name">Full Name</label>
+        </div>
+
+        <div class="col-md-8">
+            <input class="form-control" id="full_name" name="full_name" list="field_builders" placeholder="Full Name" required>
+            <datalist id="field_builders">
+                {%  for buildier in field_builders %}
+                <option value="{{ buildier.full_name }}">{{ buildier.full_name }}</option>
+                {%  endfor %}
+            </datalist>
+        </div>
+
+        <div class="col-md-2">
+            <input type="submit" value="Sign In">
+        </div>
 </form>
 
-<p id="status_msg" style="{%  if request.session.good_result %}color: green {%  else %} color: red {% endif %}">{{ request.session.result_msg }}</p>
+<div class="row">
+    <p id="status_msg" style="{%  if request.session.good_result %}color: green {%  else %} color: red {% endif %}">{{ request.session.result_msg }}</p>
+</div>
 
 </div><!-- container //  -->
 
