@@ -7,7 +7,10 @@ from attendance.models import (
     FieldBuilder,
 )
 from attendance.models.gos import GosStudent, GosAttendance
-from attendance.views.utils import create_calendar_events_from_attendance
+from attendance.views.utils import (
+    create_calendar_events_from_attendance,
+    get_navbar_context,
+)
 
 
 class IndexView(generic.TemplateView):
@@ -18,7 +21,23 @@ class IndexView(generic.TemplateView):
 
         calendar_events.extend(
             create_calendar_events_from_attendance(
-                GosAttendance.objects.all(), "GOS", "blue"
+                GosAttendance.objects.filter(student__gos_program="FRC"),
+                "GOS FRC",
+                "blue",
+            )
+        )
+        calendar_events.extend(
+            create_calendar_events_from_attendance(
+                GosAttendance.objects.filter(student__gos_program="FTC"),
+                "GOS FTC",
+                "orange",
+            )
+        )
+        calendar_events.extend(
+            create_calendar_events_from_attendance(
+                GosAttendance.objects.filter(student__gos_program="UNASSIGNED"),
+                "GOS Unassigned",
+                "gray",
             )
         )
 
@@ -35,6 +54,7 @@ class IndexView(generic.TemplateView):
         )
 
         context = super().get_context_data(**kwargs)
+        context.update(get_navbar_context())
         context["calendar_events"] = calendar_events
         return context
 
@@ -44,6 +64,7 @@ class ActiveManifest(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context.update(get_navbar_context())
         context["gos_students"] = [
             student for student in GosStudent.objects.all() if student.is_logged_in()
         ]

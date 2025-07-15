@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>GOS Attendance</title>
+
+    <link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'attendance/navbar.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+</head>
+<body>
+
+<div class="container">
+
+{% include "attendance/shared/navbar.html" %}
+
+<h1>Program - {{ program_name }}</h1>
+
+{% include "attendance/gos/sub_templates/student_table.html" with students=students %}
+
+</div><!-- container //  -->
+
+</body>
+</html>

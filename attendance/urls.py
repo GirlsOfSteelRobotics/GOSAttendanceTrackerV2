@@ -8,6 +8,7 @@ from .views import top_level
 urlpatterns = [
     path("", top_level.IndexView.as_view(), name="index"),
     path("manifest/", top_level.ActiveManifest.as_view(), name="active_manifest"),
+    # GOS
     path("gos/", gos.GosStudentSummaryView.as_view(), name="gos_student_summary"),
     path("gos/signin", gos.gos_signin, name="gos_signin"),
     path(
@@ -24,6 +25,46 @@ urlpatterns = [
         "gos/<int:rfid>/",
         gos.GosStudentDetailView.as_view(),
         name="gos_student_detail",
+    ),
+    path(
+        "gos/program",
+        gos.GosProgramList.as_view(),
+        name="gos_program_list",
+    ),
+    path(
+        "gos/program/<str:program>",
+        gos.GosProgramDetail.as_view(),
+        name="gos_program_detail",
+    ),
+    path(
+        "gos/crews",
+        gos.GosPresasonCrewList.as_view(),
+        name="gos_preseason_crews",
+    ),
+    path(
+        "gos/crews/<str:crew>",
+        gos.GosPresasonCrewDetail.as_view(),
+        name="gos_preseason_crews_detail",
+    ),
+    path(
+        "gos/grades",
+        gos.GosGradeYearList.as_view(),
+        name="gos_grade_year_list",
+    ),
+    path(
+        "gos/grades/<int:grade_year>",
+        gos.GosGradeYearDetail.as_view(),
+        name="gos_grade_year_detail",
+    ),
+    path(
+        "gos/subteam",
+        gos.GosSubteamList.as_view(),
+        name="gos_subteam_list",
+    ),
+    path(
+        "gos/subteam/<str:subteam>",
+        gos.GosSubteamDetail.as_view(),
+        name="gos_subteam_detail",
     ),
     # SCRA
     path("scra/signin", scra.ScraSignin.as_view(), name="scra_signin"),
