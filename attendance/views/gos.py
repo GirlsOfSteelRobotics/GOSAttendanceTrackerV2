@@ -3,12 +3,15 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import generic
 
-from attendance.models import GosProgram, GosSubteam, GosGradeLevel
+from attendance.models import GosProgram, GosSubteam, GosGradeLevel, GosAttendance
 from attendance.models.gos import GosStudent, GosPreseasonCrew
+from attendance.views.plotting_utils import (
+    render_count_pie_chart,
+    render_box_and_whisker_plot,
+    render_cumulative_hours_plot,
+)
 from attendance.views.utils import get_navbar_context
-
 import pandas as pd
-
 
 
 class GosStudentSummaryView(generic.ListView):
@@ -18,6 +21,12 @@ class GosStudentSummaryView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(get_navbar_context())
+
+        plots = []
+        plots.append(render_cumulative_hours_plot(GosStudent.objects.all()))
+
+        context["plots"] = plots
+
         return context
 
 
@@ -29,6 +38,9 @@ class GosPresasonCrewDetail(generic.TemplateView):
         context = get_navbar_context()
         context["crew_name"] = crew
         context["students"] = students
+        context["plots"] = [
+            render_cumulative_hours_plot(students)
+        ]
         return context
 
 
@@ -70,6 +82,10 @@ class GosProgramDetail(generic.TemplateView):
         context = get_navbar_context()
         context["program_name"] = program
         context["students"] = students
+
+        context["plots"] = [
+            render_cumulative_hours_plot(students)
+        ]
         return context
 
 
@@ -145,9 +161,14 @@ class GosGradeYearDetail(generic.TemplateView):
     template_name = "attendance/gos/grade_year_detail.html"
 
     def get_context_data(self, grade_year):
+        students = GosStudent.objects.filter(grade=grade_year)
+
         context = get_navbar_context()
         context["grade"] = grade_year
-        context["students"] = GosStudent.objects.filter(grade=grade_year)
+        context["students"] = students
+        context["plots"] = [
+            render_cumulative_hours_plot(students)
+        ]
         return context
 
 
@@ -261,6 +282,10 @@ class GosSubteamDetail(generic.TemplateView):
     template_name = "attendance/gos/subteam_detail.html"
 
     def get_context_data(self, subteam):
+        students = GosStudent.objects.filter(subteam=subteam)
         context = get_navbar_context()
-        context["students"] = GosStudent.objects.filter(subteam=subteam)
+        context["students"] = students
+        context["plots"] = [
+            render_cumulative_hours_plot(students)
+        ]
         return context
