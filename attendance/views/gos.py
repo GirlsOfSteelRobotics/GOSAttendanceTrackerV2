@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import generic
 
-from attendance.models import GosProgram, GosSubteam, GosGradeLevel, GosAttendance
+from attendance.models import GosProgram, GosSubteam, GosGradeLevel
 from attendance.models.gos import GosStudent, GosPreseasonCrew
 from attendance.views.plotting_utils import (
     render_count_pie_chart,
