@@ -3,7 +3,6 @@ import plotly.graph_objects as go
 import pandas as pd
 
 
-
 def render_html_figure(figure):
     return figure.to_html(full_html=False, include_plotlyjs="cdn")
 
