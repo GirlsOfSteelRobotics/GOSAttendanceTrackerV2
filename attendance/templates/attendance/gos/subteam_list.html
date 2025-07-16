@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="{% static 'attendance/navbar.js' %}"></script>
     <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
-{% include "attendance/shared/calendar_script.html" with events=object.gosattendance_set.all %}
 </head>
 <body>
 
@@ -17,30 +16,18 @@
 
 <div class="container">
 
+<h1>Subteams</h1>
 
-<h1>{{ object.full_name }}</h1>
+{% autoescape off %}
+{% for plot in plots %}
+{{plot}}
+{% endfor %}
+{% endautoescape %}
 
-<div id='calendar'></div>
-
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Time In</th>
-            <th>Time Out</th>
-            <th>Duration</th>
-        </tr>
-    </thead>
-    <tbody>
-    {%  for att in object.gosattendance_set.all %}
-        <tr>
-            <td>{{ att.time_in }}</td>
-            <td>{{ att.time_out }}</td>
-            <td>{{ att.get_duration }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{%  for subteam, subteam_students in subteams.items %}
+<h2 id="{{ subteam }}">{{ subteam }}</h2>
+{% include "attendance/gos/sub_templates/student_table.html" with students=subteam_students %}
+{% endfor %}
 
 </div><!-- container //  -->
 

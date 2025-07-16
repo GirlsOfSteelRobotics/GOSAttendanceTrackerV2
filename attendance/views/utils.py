@@ -3,6 +3,9 @@ from typing import Optional
 
 from django.db.models import Count
 
+from attendance.models import GosPreseasonCrew, GosProgram
+from attendance.models.gos import GosGradeLevel, GosSubteam
+
 
 class CalendarEvent:
     def __init__(
@@ -41,3 +44,13 @@ def create_calendar_events_from_attendance(query_set, title, color=None):
         )
 
     return calendar_events
+
+
+def get_navbar_context():
+    context = {}
+    context["NAVBAR_GOS_CREWS"] = GosPreseasonCrew.choices
+    context["NAVBAR_GOS_PROGRAMS"] = GosProgram.choices
+    context["NAVBAR_GOS_SUBTEAMS"] = GosSubteam.choices
+    context["NAVBAR_GOS_GRADES"] = GosGradeLevel.choices
+
+    return context

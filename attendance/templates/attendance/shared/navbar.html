@@ -13,6 +13,34 @@
 		    <ul class="dropdown-menu">
 			  <li><a class="dropdown-item" href="{% url 'gos_signin' %}"> Sign In </a></li>
 			  <li><a class="dropdown-item" href="{% url 'gos_student_summary' %}"> Overview </a></li>
+			  <li><a class="dropdown-item" href="{% url 'gos_preseason_crews' %}"> Preseason Crews &raquo; </a>
+			  	 <ul class="submenu dropdown-menu">
+                     {%  for crew in NAVBAR_GOS_CREWS %}
+				    <li><a class="dropdown-item" href="{% url 'gos_preseason_crews_detail' crew.0  %}">{{ crew.0 }}</a></li>
+                     {%  endfor %}
+				 </ul>
+              </li>
+			  <li><a class="dropdown-item" href="{% url 'gos_program_list' %}"> Programs &raquo; </a>
+			  	 <ul class="submenu dropdown-menu">
+                     {%  for program in NAVBAR_GOS_PROGRAMS %}
+				    <li><a class="dropdown-item" href="{% url 'gos_program_detail' program.0  %}">{{ program.0 }}</a></li>
+                     {%  endfor %}
+				 </ul>
+			  </li>
+			  <li><a class="dropdown-item" href="{% url 'gos_subteam_list' %}"> Subteams &raquo; </a>
+			  	 <ul class="submenu dropdown-menu">
+                     {% for subteam in NAVBAR_GOS_SUBTEAMS %}
+				    <li><a class="dropdown-item" href="{% url 'gos_subteam_detail' subteam.0 %}">{{ subteam.0 }}</a></li>
+                     {% endfor %}
+				 </ul>
+			  </li>
+			  <li><a class="dropdown-item" href="{% url 'gos_grade_year_list' %}"> Grades &raquo; </a>
+			  	 <ul class="submenu dropdown-menu">
+                     {% for grade in NAVBAR_GOS_GRADES %}
+				    <li><a class="dropdown-item" href="{% url 'gos_grade_year_detail' grade.0 %}">{{ grade.0 }}</a></li>
+                     {% endfor %}
+				 </ul>
+			  </li>
 		    </ul>
 		</li>
 		<li class="nav-item dropdown">

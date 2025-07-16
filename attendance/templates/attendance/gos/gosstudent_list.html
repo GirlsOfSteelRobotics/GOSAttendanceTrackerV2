@@ -12,12 +12,17 @@
 </head>
 <body>
 
+{% include "attendance/shared/navbar.html" %}
 <div class="container">
 
-{% include "attendance/shared/navbar.html" %}
 
 <h1>GOS Overview</h1>
 
+{% autoescape off %}
+{% for plot in plots %}
+{{plot}}
+{% endfor %}
+{% endautoescape %}
 
 {% include "attendance/gos/sub_templates/student_table.html" with students=object_list %}
 
