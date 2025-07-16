@@ -38,9 +38,7 @@ class GosPresasonCrewDetail(generic.TemplateView):
         context = get_navbar_context()
         context["crew_name"] = crew
         context["students"] = students
-        context["plots"] = [
-            render_cumulative_hours_plot(students)
-        ]
+        context["plots"] = [render_cumulative_hours_plot(students)]
         return context
 
 
@@ -83,9 +81,7 @@ class GosProgramDetail(generic.TemplateView):
         context["program_name"] = program
         context["students"] = students
 
-        context["plots"] = [
-            render_cumulative_hours_plot(students)
-        ]
+        context["plots"] = [render_cumulative_hours_plot(students)]
         return context
 
 
@@ -166,9 +162,7 @@ class GosGradeYearDetail(generic.TemplateView):
         context = get_navbar_context()
         context["grade"] = grade_year
         context["students"] = students
-        context["plots"] = [
-            render_cumulative_hours_plot(students)
-        ]
+        context["plots"] = [render_cumulative_hours_plot(students)]
         return context
 
 
@@ -285,7 +279,5 @@ class GosSubteamDetail(generic.TemplateView):
         students = GosStudent.objects.filter(subteam=subteam)
         context = get_navbar_context()
         context["students"] = students
-        context["plots"] = [
-            render_cumulative_hours_plot(students)
-        ]
+        context["plots"] = [render_cumulative_hours_plot(students)]
         return context
