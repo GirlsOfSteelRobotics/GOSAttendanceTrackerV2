@@ -19,10 +19,10 @@
 {% for student in students %}
     <tr>
         <td><a href="{% url 'gos_student_detail' student.rfid %}">{{ student.full_name }}</a></td>
-        <td>{{ student.grade }}</td>
-        <td>{{ student.gos_program }}</td>
-        <td>{{ student.preseason_crew }}</td>
-        <td>{{ student.subteam }}</td>
+        <td><a href="{% url 'gos_grade_year_detail' student.grade %}">{{ student.grade }}</a></td>
+        <td><a href="{% url 'gos_program_detail' student.gos_program %}">{{ student.gos_program }}</a></td>
+        <td><a href="{% url 'gos_preseason_crews_detail' student.preseason_crew  %}">{{ student.preseason_crew }}</a></td>
+        <td><a href="{% url 'gos_subteam_detail' student.subteam %}">{{ student.subteam }}</a></td>
         <td>{{ student.num_meetings }}</td>
         <td>{{ student.num_hours|floatformat:2 }}</td>
     </tr>

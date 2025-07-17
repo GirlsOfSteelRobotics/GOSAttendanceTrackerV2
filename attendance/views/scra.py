@@ -4,6 +4,7 @@ from django.views import generic
 
 from attendance.models import ScraVisitor, ScraVisitorAttendance
 from attendance.views.utils import (
+    get_navbar_context,
     create_calendar_events_from_attendance,
 )
 
@@ -34,7 +35,7 @@ class ScraSignin(generic.TemplateView):
             for bad_name in bad_names:
                 teams_data[team_number].remove(bad_name)
 
-        context = {}
+        context = get_navbar_context()
         context["teams"] = teams_data
         return context
 
@@ -57,7 +58,7 @@ class ScraVisitorList(generic.TemplateView):
             team_number = fields["team_number"]
             teams_data[team_number] = ScraVisitor.objects.filter(
                 team_number=team_number
-            )
+            ).order_by("full_name")
 
             calendar_events.extend(
                 create_calendar_events_from_attendance(
@@ -68,7 +69,7 @@ class ScraVisitorList(generic.TemplateView):
                 )
             )
 
-        context = {}
+        context = get_navbar_context()
         context["teams"] = teams_data
         context["calendar_events"] = calendar_events
         return context

@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views import generic
 
 from attendance.models import FieldBuilder, FieldBuilderAttendance
-from attendance.views.utils import CalendarEvent
+from attendance.views.utils import get_navbar_context, CalendarEvent
 
 
 class FieldBuilderList(generic.TemplateView):
@@ -25,7 +25,7 @@ class FieldBuilderList(generic.TemplateView):
                 )
             )
 
-        context = {}
+        context = get_navbar_context()
         context["calendar_events"] = calendar_events
         context["field_builders"] = FieldBuilder.objects.all()
         return context

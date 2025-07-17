@@ -47,7 +47,6 @@ class GosPreseasonCrew(models.TextChoices):
 class GosGradeLevel(models.IntegerChoices):
     UNASSIGNED = 0
     MENTOR = 13
-
     SENIOR = 12
     JUNIOR = 11
     SOPHOMORE = 10
@@ -74,7 +73,7 @@ class GosStudent(models.Model, InOutTimeMixin):
     grade = models.IntegerField(choices=GosGradeLevel, default=GosGradeLevel.UNASSIGNED)
 
     def __str__(self):  # pragma: no cover
-        return self.full_name()
+        return self.full_name() + f" ({self.gos_program} {self.subteam} - {self.grade})"
 
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
