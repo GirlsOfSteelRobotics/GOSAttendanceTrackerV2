@@ -8,15 +8,22 @@ from attendance.models import (
     GosAttendance,
     GosStudent,
     ScraVisitor,
-    ScraVisitorAttendance, GosGradeLevel,
+    ScraVisitorAttendance,
+    GosGradeLevel,
 )
 
 
 def create_gos_student_test_data():
 
-    student1 = GosStudent.objects.create(rfid=1, first_name="Test", last_name="User1", grade=GosGradeLevel.EIGHTH)
-    student2 = GosStudent.objects.create(rfid=2, first_name="Test", last_name="User2", grade=GosGradeLevel.FRESHMAN)
-    student3 = GosStudent.objects.create(rfid=3, first_name="Test", last_name="User3", grade=GosGradeLevel.SENIOR)
+    student1 = GosStudent.objects.create(
+        rfid=1, first_name="Test", last_name="User1", grade=GosGradeLevel.EIGHTH
+    )
+    student2 = GosStudent.objects.create(
+        rfid=2, first_name="Test", last_name="User2", grade=GosGradeLevel.FRESHMAN
+    )
+    student3 = GosStudent.objects.create(
+        rfid=3, first_name="Test", last_name="User3", grade=GosGradeLevel.SENIOR
+    )
 
     now = timezone.now()
 
