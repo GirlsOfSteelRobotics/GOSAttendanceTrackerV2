@@ -42,6 +42,10 @@ class GosStudent2026(models.Model, InOutTimeMixin):
     )
     grade = models.IntegerField(choices=GosGradeLevel2026)
 
+    def __init__(self, *kargs, **kwargs):
+        models.Model.__init__(self, *kargs, **kwargs)
+        self.gosattendance_set = self.gosattendance2026_set
+
     def __str__(self):  # pragma: no cover
         return self.full_name() + f" ({self.gos_program} {self.subteam} - {self.grade})"
 

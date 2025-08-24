@@ -74,6 +74,10 @@ class GosStudent2025(models.Model, InOutTimeMixin):
         choices=GosGradeLevel2025, default=GosGradeLevel2025.UNASSIGNED
     )
 
+    def __init__(self, *kargs, **kwargs):
+        models.Model.__init__(self, *kargs, **kwargs)
+        self.gosattendance_set = self.gosattendance2025_set
+
     def __str__(self):  # pragma: no cover
         return self.full_name() + f" ({self.gos_program} {self.subteam} - {self.grade})"
 

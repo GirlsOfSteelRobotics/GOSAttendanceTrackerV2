@@ -3,7 +3,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 
-from attendance.models import GosAttendance, GosStudent
+from attendance.models import GosAttendance, GosStudent, GosGradeLevel
 
 
 class AttendanceTest(TestCase):
@@ -12,7 +12,7 @@ class AttendanceTest(TestCase):
         t = timezone.now()
 
         student = GosStudent.objects.create(
-            rfid=3504, first_name="Test", last_name="User"
+            rfid=3504, first_name="Test", last_name="User", grade=GosGradeLevel.EIGHTH
         )
         self.assertFalse(student.is_logged_in())
 
@@ -27,7 +27,7 @@ class AttendanceTest(TestCase):
 
     def test_log_in_with_partial_attendance(self):
         student = GosStudent.objects.create(
-            rfid=3504, first_name="Test", last_name="User"
+            rfid=3504, first_name="Test", last_name="User", grade=GosGradeLevel.EIGHTH
         )
         self.assertFalse(student.is_logged_in())
 
@@ -47,7 +47,7 @@ class AttendanceTest(TestCase):
 
     def test_debounce_login(self):
         student = GosStudent.objects.create(
-            rfid=3504, first_name="Test", last_name="User"
+            rfid=3504, first_name="Test", last_name="User", grade=GosGradeLevel.EIGHTH
         )
         self.assertFalse(student.is_logged_in())
 

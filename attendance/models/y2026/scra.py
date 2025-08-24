@@ -8,6 +8,10 @@ class ScraVisitor2026(models.Model, InOutTimeMixin):
     full_name = models.CharField(max_length=100)
     team_number = models.IntegerField()
 
+    def __init__(self, *kargs, **kwargs):
+        models.Model.__init__(self, *kargs, **kwargs)
+        self.scravisitorattendance_set = self.scravisitorattendance2026_set
+
     def __str__(self):  # pragma: no cover
         return f"{self.full_name} - {self.team_number}"
 

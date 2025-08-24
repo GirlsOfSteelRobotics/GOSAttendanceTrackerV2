@@ -8,6 +8,10 @@ class FieldBuilder2025(models.Model, InOutTimeMixin):
     full_name = models.CharField(max_length=100)
     forms_completed = models.BooleanField(default=False)
 
+    def __init__(self, *kargs, **kwargs):
+        models.Model.__init__(self, *kargs, **kwargs)
+        self.fieldbuilderattendance_set = self.fieldbuilderattendance2025_set
+
     def __str__(self):  # pragma: no cover
         return self.full_name
 
