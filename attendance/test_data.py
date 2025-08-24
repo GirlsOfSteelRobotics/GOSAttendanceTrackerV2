@@ -2,12 +2,11 @@ import datetime
 
 from django.utils import timezone
 
-from attendance.models import GosAttendance, GosStudent
 from attendance.models import (
     FieldBuilder,
     FieldBuilderAttendance,
-)
-from attendance.models import (
+    GosAttendance,
+    GosStudent,
     ScraVisitor,
     ScraVisitorAttendance,
 )

@@ -3,8 +3,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import generic
 
-from attendance.models import GosProgram, GosSubteam, GosGradeLevel
-from attendance.models.gos import GosStudent, GosPreseasonCrew
+from attendance.models import (
+    GosProgram,
+    GosSubteam,
+    GosGradeLevel,
+    GosStudent,
+    GosPreseasonCrew,
+)
 from attendance.views.plotting_utils import (
     render_count_pie_chart,
     render_box_and_whisker_plot,
@@ -278,6 +283,7 @@ class GosSubteamDetail(generic.TemplateView):
     def get_context_data(self, subteam):
         students = GosStudent.objects.filter(subteam=subteam)
         context = get_navbar_context()
+        context["subteam"] = subteam
         context["students"] = students
         context["plots"] = [render_cumulative_hours_plot(students)]
         return context
