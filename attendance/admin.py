@@ -2,13 +2,13 @@
 from django.contrib import admin
 
 from attendance.models import (
-    ScraVisitor,
     FieldBuilder,
     FieldBuilderAttendance,
     GosAttendance,
+    GosStudent,
+    ScraVisitor,
     ScraVisitorAttendance,
 )
-from attendance.models.gos import GosStudent
 
 admin.site.register(GosStudent)
 admin.site.register(GosAttendance)

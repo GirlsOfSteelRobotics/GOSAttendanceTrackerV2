@@ -3,8 +3,7 @@ from typing import Optional
 
 from django.db.models import Count
 
-from attendance.models import GosPreseasonCrew, GosProgram
-from attendance.models.gos import GosGradeLevel, GosSubteam
+from attendance.models import GosGradeLevel, GosPreseasonCrew, GosProgram, GosSubteam
 
 
 class CalendarEvent:
