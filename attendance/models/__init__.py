@@ -5,7 +5,7 @@ from attendance.models.y2026.field_builders import *  # noqa
 from attendance.models.y2026.gos import *  # noqa
 from attendance.models.y2026.scra import *  # noqa
 
-year = 2025
+year = 2026
 
 if year == 2025:
 

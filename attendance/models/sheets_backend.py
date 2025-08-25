@@ -10,13 +10,14 @@ from attendance.models import (
     FieldBuilderAttendance,
 )
 
-SPREADSHEET_KEY = "1ztlyayX_A59oDQQsRPfWNKSZ-efkdWKgML-J9WtB66s"
+# SPREADSHEET_KEY = "1ztlyayX_A59oDQQsRPfWNKSZ-efkdWKgML-J9WtB66s" # 24-25
+SPREADSHEET_KEY = "1T-rXZDCy05_uNRha7ZyMda8Cs9b6YXDQLG4KUIL9tQY"  # 25-26
 
 
 def format_time(current_time) -> str:
     utc = current_time.replace(tzinfo=pytz.UTC)
     in_local = utc.astimezone(timezone.get_current_timezone())
-    return in_local.strftime("%m/%d/%y %I:%M %p")
+    return in_local.strftime("%m/%d/%y %I:%M:%S %p")
 
 
 class GoogleSheetsBackend:
@@ -55,10 +56,9 @@ class GoogleSheetsBackend:
 
     def scra_signin(self, attendance: ScraVisitorAttendance):
         row_contents = [
-            format_time(attendance.time_in),
             attendance.scra_visitor.team_number,
             attendance.scra_visitor.full_name,
-            "SCRA Open Meeting",
+            format_time(attendance.time_in),
         ]
         sheet_tab = self.spreadsheet.worksheet(self.SCRA_ATTENDANCE_TAB)
         sheet_tab.append_row(row_contents, value_input_option="USER_ENTERED")
@@ -68,16 +68,16 @@ class GoogleSheetsBackend:
         self.__signout_helper(
             attendance.scra_visitor.full_name,
             self.SCRA_ATTENDANCE_TAB,
-            5,
+            4,
             attendance.time_out,
         )
 
     def gos_signin(self, attendance: GosAttendance):
         row_contents = [
-            format_time(attendance.time_in),
-            attendance.student.rfid,
             attendance.student.full_name(),
             "General Meeting",
+            attendance.student.rfid,
+            format_time(attendance.time_in),
         ]
         sheet_tab = self.spreadsheet.worksheet(self.GOS_ATTENDANCE_TAB)
         sheet_tab.append_row(row_contents, value_input_option="USER_ENTERED")
@@ -92,8 +92,8 @@ class GoogleSheetsBackend:
 
     def field_builder_signin(self, attendance: FieldBuilderAttendance):
         row_contents = [
-            format_time(attendance.time_in),
             attendance.field_builder.full_name,
+            format_time(attendance.time_in),
         ]
         sheet_tab = self.spreadsheet.worksheet(self.FIELD_BUILDER_TAB)
         sheet_tab.append_row(row_contents, value_input_option="USER_ENTERED")

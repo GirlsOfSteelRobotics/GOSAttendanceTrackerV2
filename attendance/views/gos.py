@@ -1,7 +1,8 @@
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
+from django import forms
 
 from attendance.models import (
     GosProgram,
@@ -10,6 +11,7 @@ from attendance.models import (
     GosStudent,
     GosPreseasonCrew,
 )
+from attendance.models.y2025.gos import GosStudent2025
 from attendance.views.plotting_utils import (
     render_count_pie_chart,
     render_box_and_whisker_plot,
@@ -287,3 +289,58 @@ class GosSubteamDetail(generic.TemplateView):
         context["students"] = students
         context["plots"] = [render_cumulative_hours_plot(students)]
         return context
+
+
+class GosNewGirlForm(forms.ModelForm):
+    class Meta:
+        model = GosStudent
+        fields = ["first_name", "last_name", "grade", "rfid"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({"class": "form-control"})
+
+    def clean(self):
+        super(GosNewGirlForm, self).clean()
+
+        students = GosStudent.objects.filter(
+            first_name=self.cleaned_data["first_name"],
+            last_name=self.cleaned_data["last_name"],
+        )
+        if students:
+            self._errors["first_name"] = self.error_class(
+                ["Duplicate Name Encountered"]
+            )
+
+        if self.cleaned_data["rfid"] is None:
+            last_year_student = GosStudent2025.objects.filter(
+                first_name=self.cleaned_data["first_name"],
+                last_name=self.cleaned_data["last_name"],
+            )
+            if len(last_year_student) == 1:
+                self.cleaned_data["rfid"] = last_year_student[0].rfid
+            else:
+                self._errors["rfid"] = self.error_class(
+                    ["Name not found in 2025 database, you must specify an RFID"]
+                )
+
+        return self.cleaned_data
+
+    def save(self, commit=True):
+        student = forms.ModelForm.save(self, commit=True)
+        student.handle_signin_attempt()
+
+
+def new_girl(request):
+    if request.method == "POST":
+        form = GosNewGirlForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("gos_new_girl")
+    else:
+        form = GosNewGirlForm()
+
+    context = get_navbar_context()
+    context["form"] = form
+    return render(request, "attendance/gos/new_girl_form.html", context)
