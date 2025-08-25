@@ -26,7 +26,7 @@ class GosGradeLevel2026(models.IntegerChoices):
 
 
 class GosStudent2026(models.Model, InOutTimeMixin):
-    rfid = models.IntegerField(unique=True)
+    rfid = models.IntegerField(unique=True, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     gos_program = models.CharField(
