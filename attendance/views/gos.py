@@ -291,7 +291,7 @@ class GosSubteamDetail(generic.TemplateView):
         return context
 
 
-class GosNewGirlForm(forms.ModelForm):
+class GosNewStudentForm(forms.ModelForm):
     class Meta:
         model = GosStudent
         fields = ["first_name", "last_name", "grade", "rfid"]
@@ -302,7 +302,7 @@ class GosNewGirlForm(forms.ModelForm):
             self.fields[field_name].widget.attrs.update({"class": "form-control"})
 
     def clean(self):
-        super(GosNewGirlForm, self).clean()
+        super(GosNewStudentForm, self).clean()
 
         students = GosStudent.objects.filter(
             first_name=self.cleaned_data["first_name"],
@@ -332,15 +332,15 @@ class GosNewGirlForm(forms.ModelForm):
         student.handle_signin_attempt()
 
 
-def new_girl(request):
+def new_student(request):
     if request.method == "POST":
-        form = GosNewGirlForm(request.POST)
+        form = GosNewStudentForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("gos_new_girl")
+            return redirect("new_student")
     else:
-        form = GosNewGirlForm()
+        form = GosNewStudentForm()
 
     context = get_navbar_context()
     context["form"] = form
-    return render(request, "attendance/gos/new_girl_form.html", context)
+    return render(request, "attendance/gos/new_student_form.html", context)

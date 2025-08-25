@@ -67,9 +67,9 @@ urlpatterns = [
         name="gos_subteam_detail",
     ),
     path(
-        "gos/new_girl",
-        gos.new_girl,
-        name="gos_new_girl",
+        "gos/new_student",
+        gos.new_student,
+        name="new_student",
     ),
     # SCRA
     path("scra/signin", scra.ScraSignin.as_view(), name="scra_signin"),
