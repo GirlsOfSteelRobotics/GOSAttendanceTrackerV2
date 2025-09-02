@@ -5,6 +5,10 @@ from typing import Optional, Tuple
 from django.db import models
 from django.utils import timezone
 
+from attendance.models.date_ranges import (
+    get_date_range,
+    get_filter_attendance_by_date_range_query,
+)
 
 CROSS_POST_LOGINS = True
 
@@ -73,12 +77,19 @@ class InOutTimeMixin:
 
         return msg, good_result
 
+    def _attendance_filter(self):
+        query_dict = get_filter_attendance_by_date_range_query()
+        attendance_query = self._get_attendance_set().filter(**query_dict)
+        return attendance_query
+
     def num_meetings(self):
-        return len(self._get_attendance_set().all())
+        attendance_query = self._attendance_filter()
+        return len(attendance_query)
 
     def num_hours(self):
+        attendance_query = self._attendance_filter()
         total_time = sum(
-            [x.get_duration() for x in self._get_attendance_set().all()],
+            [x.get_duration() for x in attendance_query],
             datetime.timedelta(),
         )
         return total_time.total_seconds() / 3600

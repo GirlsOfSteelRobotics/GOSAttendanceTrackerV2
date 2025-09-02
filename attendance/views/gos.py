@@ -16,8 +16,9 @@ from attendance.views.plotting_utils import (
     render_count_pie_chart,
     render_box_and_whisker_plot,
     render_cumulative_hours_plot,
+    render_hours_scatter,
 )
-from attendance.views.utils import get_navbar_context
+from attendance.views.utils import get_navbar_context, get_recommended_hour_lines
 import pandas as pd
 
 
@@ -25,12 +26,18 @@ class GosStudentSummaryView(generic.ListView):
     model = GosStudent
     template_name = "attendance/gos/gosstudent_list.html"
 
+    ordering = ["first_name"]
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(get_navbar_context())
 
         plots = []
-        plots.append(render_cumulative_hours_plot(GosStudent.objects.all()))
+        plots.append(
+            render_cumulative_hours_plot(
+                GosStudent.objects.all(), get_recommended_hour_lines()
+            )
+        )
 
         context["plots"] = plots
 
@@ -41,11 +48,13 @@ class GosPresasonCrewDetail(generic.TemplateView):
     template_name = "attendance/gos/ftc_crew_detail.html"
 
     def get_context_data(self, crew):
-        students = GosStudent.objects.filter(preseason_crew=crew)
+        students = GosStudent.objects.filter(preseason_crew=crew).order_by("first_name")
         context = get_navbar_context()
         context["crew_name"] = crew
         context["students"] = students
-        context["plots"] = [render_cumulative_hours_plot(students)]
+        context["plots"] = [
+            render_cumulative_hours_plot(students, get_recommended_hour_lines())
+        ]
         return context
 
 
@@ -55,7 +64,9 @@ class GosPresasonCrewList(generic.TemplateView):
     def get_context_data(self):
         crews = {}
         for crew_name, _ in GosPreseasonCrew.choices:
-            students = GosStudent.objects.filter(preseason_crew=crew_name)
+            students = GosStudent.objects.filter(preseason_crew=crew_name).order_by(
+                "first_name"
+            )
             crews[crew_name] = students
 
         df = pd.DataFrame(list(GosStudent.objects.all().values()))
@@ -83,12 +94,14 @@ class GosProgramDetail(generic.TemplateView):
     template_name = "attendance/gos/gos_program_detail.html"
 
     def get_context_data(self, program):
-        students = GosStudent.objects.filter(gos_program=program)
+        students = GosStudent.objects.filter(gos_program=program).order_by("first_name")
         context = get_navbar_context()
         context["program_name"] = program
         context["students"] = students
 
-        context["plots"] = [render_cumulative_hours_plot(students)]
+        context["plots"] = [
+            render_cumulative_hours_plot(students, get_recommended_hour_lines())
+        ]
         return context
 
 
@@ -98,7 +111,9 @@ class GosProgramList(generic.TemplateView):
     def get_context_data(self):
         programs = {}
         for program_name, _ in GosProgram.choices:
-            students = GosStudent.objects.filter(gos_program=program_name)
+            students = GosStudent.objects.filter(gos_program=program_name).order_by(
+                "first_name"
+            )
             programs[program_name] = students
 
         df = pd.DataFrame(list(GosStudent.objects.all().values()))
@@ -130,7 +145,7 @@ class GosStudentDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(get_navbar_context())
-        context["attendance"] = []
+        context["plots"] = [render_hours_scatter(kwargs["object"])]
         return context
 
 
@@ -140,7 +155,7 @@ class GosGradeYearList(generic.TemplateView):
     def get_context_data(self):
         grades = {}
         for grade, _ in GosGradeLevel.choices:
-            students = GosStudent.objects.filter(grade=grade)
+            students = GosStudent.objects.filter(grade=grade).order_by("first_name")
             grades[grade] = students
 
         df = pd.DataFrame(list(GosStudent.objects.all().values()))
@@ -164,12 +179,14 @@ class GosGradeYearDetail(generic.TemplateView):
     template_name = "attendance/gos/grade_year_detail.html"
 
     def get_context_data(self, grade_year):
-        students = GosStudent.objects.filter(grade=grade_year)
+        students = GosStudent.objects.filter(grade=grade_year).order_by("first_name")
 
         context = get_navbar_context()
         context["grade"] = grade_year
         context["students"] = students
-        context["plots"] = [render_cumulative_hours_plot(students)]
+        context["plots"] = [
+            render_cumulative_hours_plot(students, get_recommended_hour_lines())
+        ]
         return context
 
 
@@ -243,8 +260,12 @@ class GosSubteamList(generic.TemplateView):
             students = GosStudent.objects.filter(subteam=subteam_name)
             subteams[subteam_name] = students
 
-        frc_students = GosStudent.objects.filter(gos_program="FRC")
-        ftc_students = GosStudent.objects.filter(gos_program="FTC")
+        frc_students = GosStudent.objects.filter(gos_program="FRC").order_by(
+            "first_name"
+        )
+        ftc_students = GosStudent.objects.filter(gos_program="FTC").order_by(
+            "first_name"
+        )
 
         frc_df = pd.DataFrame(list(frc_students.values()))
         ftc_df = pd.DataFrame(list(ftc_students.values()))
@@ -283,11 +304,13 @@ class GosSubteamDetail(generic.TemplateView):
     template_name = "attendance/gos/subteam_detail.html"
 
     def get_context_data(self, subteam):
-        students = GosStudent.objects.filter(subteam=subteam)
+        students = GosStudent.objects.filter(subteam=subteam).order_by("first_name")
         context = get_navbar_context()
         context["subteam"] = subteam
         context["students"] = students
-        context["plots"] = [render_cumulative_hours_plot(students)]
+        context["plots"] = [
+            render_cumulative_hours_plot(students, get_recommended_hour_lines())
+        ]
         return context
 
 
