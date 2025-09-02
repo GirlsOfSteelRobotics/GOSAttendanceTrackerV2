@@ -6,7 +6,6 @@ from django.db import models
 from django.utils import timezone
 
 from attendance.models.date_ranges import (
-    get_date_range,
     get_filter_attendance_by_date_range_query,
 )
 
