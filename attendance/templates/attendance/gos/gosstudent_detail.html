@@ -20,6 +20,12 @@
 
 <h1>{{ object.full_name }}</h1>
 
+{% autoescape off %}
+{% for plot in plots %}
+{{plot}}
+{% endfor %}
+{% endautoescape %}
+
 <div id='calendar'></div>
 
 

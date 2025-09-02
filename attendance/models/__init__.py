@@ -4,10 +4,9 @@ from attendance.models.y2025.scra import *  # noqa
 from attendance.models.y2026.field_builders import *  # noqa
 from attendance.models.y2026.gos import *  # noqa
 from attendance.models.y2026.scra import *  # noqa
+from attendance.models.year import GOS_SEASON_YEAR
 
-year = 2026
-
-if year == 2025:
+if GOS_SEASON_YEAR == 2025:
 
     GosStudent = GosStudent2025
     GosAttendance = GosAttendance2025
@@ -20,7 +19,8 @@ if year == 2025:
     GosSubteam = GosSubteam2025
     GosGradeLevel = GosGradeLevel2025
     GosPreseasonCrew = GosPreseasonCrew2025
-elif year == 2026:
+
+elif GOS_SEASON_YEAR == 2026:
     GosStudent = GosStudent2026
     GosAttendance = GosAttendance2026
     ScraVisitorAttendance = ScraVisitorAttendance2026
