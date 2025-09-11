@@ -32,3 +32,4 @@ elif GOS_SEASON_YEAR == 2026:
     GosSubteam = GosSubteam2026
     GosGradeLevel = GosGradeLevel2026
     GosPreseasonCrew = GosPreseasonCrew2026
+    GosBusinessSubteams = GosBusinessTeam2026

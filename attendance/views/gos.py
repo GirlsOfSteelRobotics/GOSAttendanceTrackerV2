@@ -10,6 +10,7 @@ from attendance.models import (
     GosGradeLevel,
     GosStudent,
     GosPreseasonCrew,
+    GosBusinessSubteams,
 )
 from attendance.models.y2025.gos import GosStudent2025
 from attendance.views.plotting_utils import (
@@ -86,6 +87,56 @@ class GosPresasonCrewList(generic.TemplateView):
 
         context = get_navbar_context()
         context["crews"] = crews
+        context["plots"] = plots
+        return context
+
+
+class GosBusinessSubteamDetail(generic.TemplateView):
+    template_name = "attendance/gos/business_subteam_detail.html"
+
+    def get_context_data(self, business_subteam):
+        students = GosStudent.objects.filter(
+            business_subteam=business_subteam
+        ).order_by("first_name")
+        context = get_navbar_context()
+        context["business_subteam"] = business_subteam
+        context["students"] = students
+        context["plots"] = [
+            render_cumulative_hours_plot(students, get_recommended_hour_lines())
+        ]
+        return context
+
+
+class GosBusinessSubteamList(generic.TemplateView):
+    template_name = "attendance/gos/business_subteam_list.html"
+
+    def get_context_data(self):
+        subteams = {}
+        for subteam_name, _ in GosBusinessSubteams.choices:
+            print(subteam_name)
+            students = GosStudent.objects.filter(
+                business_subteam=subteam_name
+            ).order_by("first_name")
+            print(students)
+            subteams[subteam_name] = students
+
+        df = pd.DataFrame(list(GosStudent.objects.all().values()))
+
+        plots = []
+        plots.append(
+            render_count_pie_chart(df, "business_subteam", "id", title="Subteam Sizes")
+        )
+        plots.append(
+            render_box_and_whisker_plot(
+                df,
+                "business_subteam",
+                [student.num_hours() for student in GosStudent.objects.all()],
+                title="Subteam Hours",
+            )
+        )
+
+        context = get_navbar_context()
+        context["business_subteams"] = subteams
         context["plots"] = plots
         return context
 

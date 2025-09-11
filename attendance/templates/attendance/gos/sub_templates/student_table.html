@@ -8,9 +8,10 @@
       <tr>
         <th>Name</th>
         <th>Grade</th>
-        <th>Program</th>
+<!--        <th>Program</th>-->
+        <th>Business Team</th>
         <th>Preseason Crew</th>
-        <th>Subteam</th>
+<!--        <th>Subteam</th>-->
         <th>Num Meetings</th>
         <th>Hours Logged</th>
       </tr>
@@ -20,9 +21,10 @@
     <tr>
         <td><a href="{% url 'gos_student_detail' student.rfid %}">{{ student.full_name }}</a></td>
         <td><a href="{% url 'gos_grade_year_detail' student.grade %}">{{ student.grade }}</a></td>
-        <td><a href="{% url 'gos_program_detail' student.gos_program %}">{{ student.gos_program }}</a></td>
+<!--        <td><a href="{% url 'gos_program_detail' student.gos_program %}">{{ student.gos_program }}</a></td>-->
+        <td><a href="{% url 'gos_business_team_detail' student.business_subteam %}">{{ student.business_subteam }}</a></td>
         <td><a href="{% url 'gos_preseason_crews_detail' student.preseason_crew  %}">{{ student.preseason_crew }}</a></td>
-        <td><a href="{% url 'gos_subteam_detail' student.subteam %}">{{ student.subteam }}</a></td>
+<!--        <td><a href="{% url 'gos_subteam_detail' student.subteam %}">{{ student.subteam }}</a></td>-->
         <td>{{ student.num_meetings }}</td>
         <td>{{ student.num_hours|floatformat:2 }}</td>
     </tr>
