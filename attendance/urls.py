@@ -5,7 +5,10 @@ from .views import field_builders
 from .views import scra
 from .views import top_level
 
+# from .tools import import_metadata_view
+
 urlpatterns = [
+    # path("import_metadata", import_metadata_view.import_data, name="import_metadata"),
     path("", top_level.IndexView.as_view(), name="index"),
     path("manifest/", top_level.ActiveManifest.as_view(), name="active_manifest"),
     # GOS

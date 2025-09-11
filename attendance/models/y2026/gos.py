@@ -11,22 +11,33 @@ class GosSubteam2026(models.TextChoices):
 class GosBusinessTeam2026(models.TextChoices):
     UNASSIGNED = "UNASSIGNED"
 
+    MENTOR = "Mentor"
+
     MEDIA = "Media"
     AWARDS = "Awards"
     FINANCE = "Finance"
     OUTREACH = "Outreach"
     FIRST_LADIES = "FIRST Ladies"
     ADVOCACY = "Advocacy"
+    BPM = "BPM"
+    COMMUNITY_ENGAGEMENT = "Community Engagement"
+    FLL = "FLL"
+    STUDENT_SUPPORT = "Student Support"
 
 
 class GosProgram2026(models.TextChoices):
     UNASSIGNED = "UNASSIGNED"
+
+    FRC = "FRC"
+    FTC = "FTC"
+    MENTOR = "Mentor"
 
 
 class GosPreseasonCrew2026(models.TextChoices):
     UNASSIGNED = "UNASSIGNED"
 
     TECH_LEAD = "Tech Lead"
+    MENTOR = "Mentor"
 
     CREW1 = "Crew 1"
     CREW2 = "Crew 2"
@@ -49,6 +60,8 @@ class GosGradeLevel2026(models.IntegerChoices):
     FRESHMAN = 9
     EIGHTH = 8
     SEVENTH = 7
+
+    MENTOR = 0
 
 
 class GosStudent2026(models.Model, InOutTimeMixin):

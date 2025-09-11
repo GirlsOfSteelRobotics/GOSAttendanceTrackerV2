@@ -7,6 +7,7 @@ from attendance.models import (
     GosStudent,
     ScraVisitor,
     ScraVisitorAttendance,
+    GosGradeLevel,
 )
 from attendance.views.utils import (
     create_calendar_events_from_attendance,
@@ -20,27 +21,45 @@ class IndexView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         calendar_events = []
 
-        calendar_events.extend(
-            create_calendar_events_from_attendance(
-                GosAttendance.objects.filter(student__gos_program="FRC"),
-                "GOS FRC",
-                "blue",
+        GOS_PROGRAMS_DEFINED = False
+
+        if GOS_PROGRAMS_DEFINED:
+            calendar_events.extend(
+                create_calendar_events_from_attendance(
+                    GosAttendance.objects.filter(student__gos_program="FRC"),
+                    "GOS FRC",
+                    "blue",
+                )
             )
-        )
-        calendar_events.extend(
-            create_calendar_events_from_attendance(
-                GosAttendance.objects.filter(student__gos_program="FTC"),
-                "GOS FTC",
-                "orange",
+            calendar_events.extend(
+                create_calendar_events_from_attendance(
+                    GosAttendance.objects.filter(student__gos_program="FTC"),
+                    "GOS FTC",
+                    "orange",
+                )
             )
-        )
-        calendar_events.extend(
-            create_calendar_events_from_attendance(
-                GosAttendance.objects.filter(student__gos_program="UNASSIGNED"),
-                "GOS Unassigned",
-                "gray",
+            calendar_events.extend(
+                create_calendar_events_from_attendance(
+                    GosAttendance.objects.filter(student__gos_program="UNASSIGNED"),
+                    "GOS Unassigned",
+                    "gray",
+                )
             )
-        )
+        else:
+            calendar_events.extend(
+                create_calendar_events_from_attendance(
+                    GosAttendance.objects.exclude(student__grade=GosGradeLevel.MENTOR),
+                    "GOS Mentors",
+                    "blue",
+                )
+            )
+            calendar_events.extend(
+                create_calendar_events_from_attendance(
+                    GosAttendance.objects.filter(student__grade=GosGradeLevel.MENTOR),
+                    "GOS Mentors",
+                    "green",
+                )
+            )
 
         calendar_events.extend(
             create_calendar_events_from_attendance(
