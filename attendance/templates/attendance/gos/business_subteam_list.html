@@ -1,0 +1,35 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>GOS Attendance</title>
+
+    <link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'attendance/navbar.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
+</head>
+<body>
+
+{% include "attendance/shared/navbar.html" %}
+
+<div class="container">
+
+<h1>Business Subteams</h1>
+
+{% autoescape off %}
+{% for plot in plots %}
+{{plot}}
+{% endfor %}
+{% endautoescape %}
+
+{%  for subteam_name, subteam_students in business_subteams.items %}
+<h2 id="{{ subteam_name }}">{{ subteam_name }}</h2>
+{% include "attendance/gos/sub_templates/student_table.html" with students=subteam_students %}
+{% endfor %}
+
+</div><!-- container //  -->
+
+</body>
+</html>

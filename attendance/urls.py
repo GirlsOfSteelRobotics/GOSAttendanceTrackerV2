@@ -47,6 +47,16 @@ urlpatterns = [
         name="gos_preseason_crews_detail",
     ),
     path(
+        "gos/business/<str:business_subteam>",
+        gos.GosBusinessSubteamDetail.as_view(),
+        name="gos_business_team_detail",
+    ),
+    path(
+        "gos/business/",
+        gos.GosBusinessSubteamList.as_view(),
+        name="gos_business_team_list",
+    ),
+    path(
         "gos/grades",
         gos.GosGradeYearList.as_view(),
         name="gos_grade_year_list",

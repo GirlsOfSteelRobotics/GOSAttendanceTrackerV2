@@ -8,12 +8,38 @@ class GosSubteam2026(models.TextChoices):
     UNASSIGNED = "UNASSIGNED"
 
 
+class GosBusinessTeam2026(models.TextChoices):
+    UNASSIGNED = "UNASSIGNED"
+
+    MEDIA = "Media"
+    AWARDS = "Awards"
+    FINANCE = "Finance"
+    OUTREACH = "Outreach"
+    FIRST_LADIES = "FIRST Ladies"
+    ADVOCACY = "Advocacy"
+
+
 class GosProgram2026(models.TextChoices):
     UNASSIGNED = "UNASSIGNED"
 
 
 class GosPreseasonCrew2026(models.TextChoices):
     UNASSIGNED = "UNASSIGNED"
+
+    TECH_LEAD = "Tech Lead"
+
+    CREW1 = "Crew 1"
+    CREW2 = "Crew 2"
+    CREW3 = "Crew 3"
+    CREW4 = "Crew 4"
+    CREW5 = "Crew 5"
+    CREW6 = "Crew 6"
+
+    IP_DATA_SCIENCE = "IP Data Science"
+    IP_CARBON_FOOTPRINT = "IP Carbon Footprint"
+    IP_ADVOCACY = "IP Advocacy"
+    IP_AUTOMATED_GRAPHICS = "IP Automated Graphics"
+    IP_ELEMENTARY_ROBOTICS = "IP Elementary Robotics"
 
 
 class GosGradeLevel2026(models.IntegerChoices):
@@ -35,7 +61,12 @@ class GosStudent2026(models.Model, InOutTimeMixin):
     preseason_crew = models.CharField(
         choices=GosPreseasonCrew2026.choices,
         default=GosPreseasonCrew2026.UNASSIGNED,
-        max_length=20,
+        max_length=30,
+    )
+    business_subteam = models.CharField(
+        choices=GosBusinessTeam2026.choices,
+        default=GosBusinessTeam2026.UNASSIGNED,
+        max_length=30,
     )
     subteam = models.CharField(
         choices=GosSubteam2026.choices, default=GosSubteam2026.UNASSIGNED, max_length=20

@@ -122,7 +122,7 @@ class AttendanceMixin(models.Model):
     time_out = models.DateTimeField("Time Out", null=True)
 
     def get_duration(self):
-        out = self.time_out or self.time_in + datetime.timedelta(hours=2)
+        out = self.time_out or self.time_in + datetime.timedelta(hours=0)
         return out - self.time_in
 
     class Meta:
