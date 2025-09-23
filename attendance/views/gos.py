@@ -29,6 +29,11 @@ class GosStudentSummaryView(generic.ListView):
 
     ordering = ["first_name"]
 
+    def get_queryset(self):
+        return GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR).order_by(
+            "first_name"
+        )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(get_navbar_context())
@@ -36,7 +41,8 @@ class GosStudentSummaryView(generic.ListView):
         plots = []
         plots.append(
             render_cumulative_hours_plot(
-                GosStudent.objects.all(), get_recommended_hour_lines()
+                GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR),
+                get_recommended_hour_lines(),
             )
         )
 
