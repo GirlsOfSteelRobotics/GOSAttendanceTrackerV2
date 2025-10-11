@@ -121,6 +121,14 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+# Caching
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "gos-attendance-cache",
+    }
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

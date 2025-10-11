@@ -1,81 +1,52 @@
+{% extends "attendance/base.html" %}
 {% load static %}
 
-<!DOCTYPE HTML>
-<html lang="en">
-<head>
-    <title>GoS Sign-In - GOS Attendance</title>
+{% block title %}GoS Sign-In - GOS Attendance{% endblock %}
 
-    <link rel="stylesheet" href="{% static 'attendance/bootstrap.min.css' %}">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="{% static 'attendance/navbar.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
-    <link rel="stylesheet" href="{% static 'attendance/attendance.css' %}">
-    <script>
-setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
-    </script>
-</head>
-<body id="gos">
+{% block body_id %}gos{% endblock %}
 
-{% include "attendance/shared/navbar.html" %}
-<div class="container">
-
-<div class="row text-center row-cols-6">
-    <div class="col">&nbsp;</div>
-    <div class="col-8">
-        <img src="{% static 'gos_logo3.png' %}" class="img-fluid mx-auto d-block" alt="GOS Logo"/>
+{% block content %}
+<div class="container" id="gos">
+  <div class="row text-center">
+    <div class="col-12 col-lg-8 offset-lg-2">
+      <img src="{% static 'gos_logo3.png' %}" class="img-fluid mx-auto d-block" alt="GOS Logo"/>
     </div>
-    <div class="col">&nbsp;</div>
+  </div>
+
+  <div class="mt-3">
+    <h3>SCRA visitors: Click <a href="{% url 'scra_signin' %}">here</a> to sign in.</h3>
+  </div>
+
+  {% include "attendance/shared/messages.html" %}
+
+  <form class="row g-3 align-items-end" action="{% url 'gos_log_attendance_rfid' %}" method="post" onsubmit="this.querySelector('[type=submit]').disabled=true">
+    {% csrf_token %}
+    <div class="col-12"><legend><h1>GoS - Tap your RFID keyfob</h1></legend></div>
+    <div class="col-md-2"><label for="rfid" class="form-label">RFID</label></div>
+    <div class="col-md-8">
+      <input type="text" id="rfid" name="rfid" class="form-control" inputmode="numeric" pattern="[0-9]*" autofocus autocomplete="off" aria-describedby="rfidHelp">
+      <div id="rfidHelp" class="form-text">Tap your keyfob or type your number and press Enter.</div>
+    </div>
+    <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Sign In</button></div>
+  </form>
+
+  <hr class="my-4">
+
+  <form class="row g-3 align-items-end" action="{% url 'gos_log_attendance_name' %}" method="post" onsubmit="this.querySelector('[type=submit]').disabled=true">
+    {% csrf_token %}
+    <div class="col-12"><legend><h1>GoS - Sign In with Full Name</h1></legend></div>
+    <div class="col-md-2"><label for="full_name" class="form-label">Full Name</label></div>
+    <div class="col-md-8"><input id="full_name" name="full_name" class="form-control" placeholder="First Last" autocomplete="off" autocapitalize="words"></div>
+    <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Sign In</button></div>
+  </form>
 </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <h3>SCRA visitors: Click <a href="{% url 'scra_signin' %}">here</a> to sign in.</h3>
-            <p>&nbsp;</p>
-        </div>
-    </div>
-
-    <form class="row g-3" action="{% url 'gos_log_attendance_rfid' %}" method="post">
-{% csrf_token %}
-    <div class="col-12">
-        <legend><h1>GoS - Tap your RFID keyfob</h1></legend>
-    </div>
-    <div class="col-md-2">
-        <label for="rfid" class="form-label">RFID</label>
-    </div>
-    <div class="col-md-8">
-        <input type="number" id="rfid" name="rfid" class="form-control" autofocus="autofocus" autocomplete="off" aria-autocomplete="none">
-    </div>
-    <div class="col-md-2">
-        <input type="submit" value="Sign In" class="btn btn-primary">
-    </div>
-</form>
-
-<br><br>
-
-<form class="row g-3" action="{% url 'gos_log_attendance_name' %}" method="post">
-{% csrf_token %}
-    <div class="col-12">
-        <legend><h1>GoS - Sign In with Full Name</h1></legend>
-    </div>
-    <div class="col-md-2">
-        <label for="full_name" class="form-label">Full Name</label>
-    </div>
-    <div class="col-md-8">
-        <input id="full_name" name="full_name" class="form-control" autocomplete="off" aria-autocomplete="none">
-    </div>
-    <div class="col-md-2">
-        <input type="submit" value="Sign In" class="btn btn-primary">
-    </div>
-
-</form>
-
-<div class="row">
-    <div class="col-md-12">
-        <div id="status_msg" style="{%  if request.session.good_result %}color: green {%  else %} color: red {% endif %}">{{ request.session.result_msg }}</div>
-    </div>
-</div>
-
-</div><!-- container //  -->
-
-</body>
-</html>
+<script>
+  (function(){
+    const rfid = document.getElementById('rfid');
+    if (rfid) {
+      rfid.addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); e.target.form && e.target.form.submit(); }});
+    }
+  })();
+</script>
+{% endblock %}

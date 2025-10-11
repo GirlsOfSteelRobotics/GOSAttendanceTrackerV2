@@ -3,6 +3,9 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
 from django import forms
+from django.contrib import messages
+from django.db.models import Q, Max
+from django.core.cache import cache
 
 from attendance.models import (
     GosProgram,
@@ -11,6 +14,7 @@ from attendance.models import (
     GosStudent,
     GosPreseasonCrew,
     GosBusinessSubteams,
+    GosAttendance,
 )
 from attendance.models.y2025.gos import GosStudent2025
 from attendance.views.plotting_utils import (
@@ -266,12 +270,22 @@ class GosGradeYearDetail(generic.TemplateView):
     def get_context_data(self, grade_year):
         students = GosStudent.objects.filter(grade=grade_year).order_by("first_name")
 
+        latest = GosAttendance.objects.aggregate(
+            lat_in=Max("time_in"), lat_out=Max("time_out")
+        )
+        latest_ts = max(latest.get("lat_in"), latest.get("lat_out")) if latest else None
+        cache_key = f"gos:grade_plot:{grade_year}:{latest_ts.isoformat() if latest_ts else 'none'}"
+        plot_html = cache.get(cache_key)
+        if plot_html is None:
+            plot_html = render_cumulative_hours_plot(
+                students, get_recommended_hour_lines()
+            )
+            cache.set(cache_key, plot_html, 300)
+
         context = get_navbar_context()
         context["grade"] = grade_year
         context["students"] = students
-        context["plots"] = [
-            render_cumulative_hours_plot(students, get_recommended_hour_lines())
-        ]
+        context["plots"] = [plot_html]
         return context
 
 
@@ -280,43 +294,61 @@ def gos_signin(request):
 
 
 def gos_log_attendance_rfid(request):
-    rfid = request.POST["rfid"]
+    rfid = request.POST.get("rfid", "").strip()
     try:
-        rfid = int(rfid)
+        rfid_int = int(rfid)
     except ValueError:
-        return __login_failure_redirect(
-            request, f"Invalid rfid '{rfid}'", "attendance/gos/signin.html"
-        )
+        messages.error(request, f"Invalid RFID '{rfid}'. RFID must be numeric.")
+        return redirect("gos_signin")
 
-    students = GosStudent.objects.filter(rfid=rfid)
-    if not students:
-        return __login_failure_redirect(
-            request, f"No student found with RFID {rfid}", "attendance/gos/signin.html"
-        )
+    student = GosStudent.objects.filter(rfid=rfid_int).first()
+    if not student:
+        messages.error(request, f"No student found with RFID {rfid}")
+        return redirect("gos_signin")
 
-    return __gos_handle_login(request, students[0])
+    msg, ok = student.handle_signin_attempt()
+    (messages.success if ok else messages.error)(request, msg)
+    return redirect("gos_signin")
 
 
 def gos_log_attendance_name(request):
-    full_name = request.POST["full_name"].strip()
-    name_parts = full_name.split(" ")
-    if len(name_parts) != 2:
-        return __login_failure_redirect(
-            request,
-            f"Invalid student name {full_name}, could not split the name into two parts",
-            "attendance/gos/signin.html",
+    full_name = request.POST.get("full_name", "").strip()
+    if not full_name:
+        messages.error(request, "Please enter your full name.")
+        return redirect("gos_signin")
+
+    parts = [p for p in full_name.split() if p]
+    if len(parts) < 2:
+        messages.error(request, "Please enter first and last name.")
+        return redirect("gos_signin")
+
+    first_name = parts[0]
+    last_name = " ".join(parts[1:])
+
+    # Exact, case-insensitive match first
+    matches = GosStudent.objects.filter(
+        Q(first_name__iexact=first_name) & Q(last_name__iexact=last_name)
+    )
+
+    # Fallback to startswith matching
+    if not matches.exists():
+        matches = GosStudent.objects.filter(
+            Q(first_name__istartswith=first_name) & Q(last_name__istartswith=last_name)
         )
 
-    first_name, last_name = name_parts
-    students = GosStudent.objects.filter(first_name=first_name, last_name=last_name)
-    if not students:
-        return __login_failure_redirect(
+    if matches.count() == 1:
+        student = matches.first()
+        msg, ok = student.handle_signin_attempt()
+        (messages.success if ok else messages.error)(request, msg)
+    elif matches.count() > 1:
+        messages.info(
             request,
-            f"Invalid student name {full_name}",
-            "attendance/gos/signin.html",
+            "Multiple matches found. Please refine your name (include middle/last parts).",
         )
+    else:
+        messages.error(request, f"No student found for {full_name}")
 
-    return __gos_handle_login(request, students[0])
+    return redirect("gos_signin")
 
 
 def __login_failure_redirect(request, error_msg, template_name):
@@ -352,32 +384,46 @@ class GosSubteamList(generic.TemplateView):
             "first_name"
         )
 
-        frc_df = pd.DataFrame(list(frc_students.values()))
-        ftc_df = pd.DataFrame(list(ftc_students.values()))
-        plots = []
-        plots.append(
-            render_count_pie_chart(frc_df, "subteam", "id", title="FRC Subteam Sizes")
+        latest = GosAttendance.objects.aggregate(
+            lat_in=Max("time_in"), lat_out=Max("time_out")
         )
-        plots.append(
-            render_box_and_whisker_plot(
-                frc_df,
-                "subteam",
-                [student.num_hours() for student in frc_students],
-                title="FRC Program Hours",
+        latest_ts = max(latest.get("lat_in"), latest.get("lat_out")) if latest else None
+        cache_key = (
+            f"gos:subteam_plots:{latest_ts.isoformat() if latest_ts else 'none'}"
+        )
+        plots = cache.get(cache_key)
+        if plots is None:
+            frc_df = pd.DataFrame(list(frc_students.values("id", "subteam")))
+            ftc_df = pd.DataFrame(list(ftc_students.values("id", "subteam")))
+            plots = []
+            plots.append(
+                render_count_pie_chart(
+                    frc_df, "subteam", "id", title="FRC Subteam Sizes"
+                )
             )
-        )
+            plots.append(
+                render_box_and_whisker_plot(
+                    frc_df,
+                    "subteam",
+                    [student.num_hours() for student in frc_students],
+                    title="FRC Program Hours",
+                )
+            )
 
-        plots.append(
-            render_count_pie_chart(ftc_df, "subteam", "id", title="FTC Subteam Sizes")
-        )
-        plots.append(
-            render_box_and_whisker_plot(
-                ftc_df,
-                "subteam",
-                [student.num_hours() for student in ftc_students],
-                title="FTC Program Hours",
+            plots.append(
+                render_count_pie_chart(
+                    ftc_df, "subteam", "id", title="FTC Subteam Sizes"
+                )
             )
-        )
+            plots.append(
+                render_box_and_whisker_plot(
+                    ftc_df,
+                    "subteam",
+                    [student.num_hours() for student in ftc_students],
+                    title="FTC Program Hours",
+                )
+            )
+            cache.set(cache_key, plots, 300)
 
         context = get_navbar_context()
         context["subteams"] = subteams
