@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
@@ -42,6 +42,34 @@ class GosStudentSummaryView(generic.ListView):
         plots.append(
             render_cumulative_hours_plot(
                 GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR),
+                get_recommended_hour_lines(),
+            )
+        )
+
+        context["plots"] = plots
+
+        return context
+
+
+class GosMentorSummaryView(generic.ListView):
+    model = GosStudent
+    template_name = "attendance/gos/gosmentor_list.html"
+
+    ordering = ["first_name"]
+
+    def get_queryset(self):
+        return GosStudent.objects.filter(grade=GosGradeLevel.MENTOR).order_by(
+            "first_name"
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(get_navbar_context())
+
+        plots = []
+        plots.append(
+            render_cumulative_hours_plot(
+                GosStudent.objects.filter(grade=GosGradeLevel.MENTOR),
                 get_recommended_hour_lines(),
             )
         )
@@ -306,6 +334,65 @@ def __gos_handle_login(request, student):
     request.session["result_msg"] = msg
     request.session["good_result"] = good_result
     return HttpResponseRedirect(reverse("gos_signin"))
+
+
+class GosAttendanceReportView(generic.TemplateView):
+    template_name = "attendance/gos/gos_attendance_report.html"
+
+    def get(self, request, *args, **kwargs):
+        # Build report rows
+        students = GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR).order_by(
+            "first_name", "last_name"
+        )
+        rows = []
+        for s in students:
+            attendance_qs = s._attendance_filter()
+            # Count distinct days from time_in
+            unique_days = set([a.time_in.date() for a in attendance_qs])
+            rows.append(
+                {
+                    "name": (
+                        s.full_name()
+                        if hasattr(s, "full_name")
+                        else f"{s.first_name} {s.last_name}"
+                    ),
+                    "grade": (
+                        s.get_grade_display()
+                        if hasattr(s, "get_grade_display")
+                        else s.grade
+                    ),
+                    "total_hours": (
+                        round(s.num_hours(), 2) if hasattr(s, "num_hours") else 0
+                    ),
+                    "days_checked_in": len(unique_days),
+                }
+            )
+
+        # CSV export
+        if request.GET.get("format") == "csv":
+            import csv
+            from io import StringIO
+
+            output = StringIO()
+            writer = csv.DictWriter(
+                output, fieldnames=["name", "grade", "total_hours", "days_checked_in"]
+            )
+            writer.writeheader()
+            for r in rows:
+                writer.writerow(r)
+            resp = HttpResponse(output.getvalue(), content_type="text/csv")
+            resp["Content-Disposition"] = (
+                "attachment; filename=gos_attendance_report.csv"
+            )
+            return resp
+
+        context = get_navbar_context()
+        context.update(
+            {
+                "rows": rows,
+            }
+        )
+        return render(request, self.template_name, context)
 
 
 class GosSubteamList(generic.TemplateView):
