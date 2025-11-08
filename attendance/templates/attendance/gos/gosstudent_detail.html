@@ -10,6 +10,7 @@
     <script src="{% static 'attendance/navbar.js' %}"></script>
     <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
 {% include "attendance/shared/calendar_script.html" with events=object.gosattendance_set.all %}
+{% load tz %}
 </head>
 <body>
 
@@ -38,13 +39,15 @@
         </tr>
     </thead>
     <tbody>
+    {% localtime on %}
     {%  for att in object.gosattendance_set.all %}
         <tr>
             <td>{{ att.time_in }}</td>
             <td>{{ att.time_out }}</td>
-            <td>{{ att.get_duration }}</td>
+            <td>{{ att.get_duration_hm }}</td>
         </tr>
     {% endfor %}
+    {% endlocaltime %}
     </tbody>
 </table>
 

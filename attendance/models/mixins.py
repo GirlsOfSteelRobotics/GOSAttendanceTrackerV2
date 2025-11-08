@@ -93,6 +93,20 @@ class InOutTimeMixin:
         )
         return total_time.total_seconds() / 3600
 
+    def num_hours_hm(self) -> str:
+        """Return total hours as 'H hrs M min' for the filtered attendance range."""
+        attendance_query = self._attendance_filter()
+        total_delta = sum(
+            [x.get_duration() for x in attendance_query],
+            datetime.timedelta(),
+        )
+        total_seconds = int(total_delta.total_seconds())
+        if total_seconds < 0:
+            total_seconds = 0
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        return f"{hours} hrs {minutes} min"
+
     def _log_out(self):
         last_login = self.get_last_login()
         last_login.time_out = timezone.now()
@@ -124,6 +138,16 @@ class AttendanceMixin(models.Model):
     def get_duration(self):
         out = self.time_out or self.time_in + datetime.timedelta(hours=0)
         return out - self.time_in
+
+    def get_duration_hm(self) -> str:
+        """Return duration as 'H hrs M min' without seconds."""
+        delta = self.get_duration()
+        total_seconds = int(delta.total_seconds())
+        if total_seconds < 0:
+            total_seconds = 0
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        return f"{hours} hrs {minutes} min"
 
     class Meta:
         abstract = True

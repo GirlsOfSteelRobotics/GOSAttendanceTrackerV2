@@ -4,8 +4,17 @@
   max-width: 1100px;
   margin: 40px auto;
 }
+/* Stack custom event content vertically and prevent overlap */
+.fc .fc-daygrid-event .fc-event-main-frame { flex-direction: column; align-items: flex-start; }
+.fc .fc-daygrid-event .fc-event-title, .fc .fc-daygrid-event .fc-event-duration { white-space: normal; display: block; line-height: 1.2; }
+/* optional: slightly de-emphasize duration line */
+.fc .fc-event-duration {
+  opacity: 0.9;
+  font-size: 0.9em;
+}
 </style>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+{% load tz %}
 <script>
       document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
@@ -16,12 +25,22 @@
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
           },
+          displayEventTime: false,
+          eventDisplay: 'block',
+          eventContent: function(arg) {
+            var title = arg.event.title || '';
+            var duration = arg.event.extendedProps && arg.event.extendedProps.duration;
+            var html = '<div class="fc-event-title">' + title + '</div>' + (duration ? '<div class="fc-event-duration">(' + duration + ')</div>' : '');
+            return { html: html };
+          },
           events: [
+            {% localtime on %}
             {%  for att in events %}
                {
-                 title: "{{ att.title }}",
+                 title: "{{ att.time_in|date:'g:i a' }}{% if att.time_out %} - {{ att.time_out|date:'g:i a' }}{% endif %}",
+                 extendedProps: { duration: "{{ att.get_duration_hm }}" },
                 {% if att.show_as_all_day %}
-                 allDay: "true",
+                 allDay: true,
                 {% endif %}
                  start: "{{  att.time_in|date:'Y-m-d\\TH:i:s'}}",
                {%  if att.time_out %}
@@ -32,6 +51,7 @@
                 {%  endif %}
                },
             {% endfor %}
+            {% endlocaltime %}
           ]
         });
         calendar.render();
