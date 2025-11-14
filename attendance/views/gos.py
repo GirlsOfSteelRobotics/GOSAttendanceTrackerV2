@@ -284,7 +284,9 @@ def gos_log_attendance_rfid(request):
     rfid = request.POST.get("rfid")
     if rfid is None or str(rfid).strip() == "":
         return __login_failure_redirect(
-            request, "Please tap your RFID keyfob or enter your RFID.", "attendance/gos/signin.html"
+            request,
+            "Please tap your RFID keyfob or enter your RFID.",
+            "attendance/gos/signin.html",
         )
     try:
         rfid = int(rfid)
