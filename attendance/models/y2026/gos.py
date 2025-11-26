@@ -68,6 +68,7 @@ class GosStudent2026(models.Model, InOutTimeMixin):
     rfid = models.IntegerField(unique=True, blank=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    inactive = models.BooleanField(default=False)
     gos_program = models.CharField(
         choices=GosProgram2026.choices, default=GosProgram2026.UNASSIGNED, max_length=20
     )
