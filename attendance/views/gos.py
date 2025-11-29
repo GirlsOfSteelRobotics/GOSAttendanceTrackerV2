@@ -30,8 +30,10 @@ class GosStudentSummaryView(generic.ListView):
     ordering = ["first_name"]
 
     def get_queryset(self):
-        return GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR).order_by(
-            "first_name"
+        return (
+            GosStudent.objects.filter(inactive=False)
+            .exclude(grade=GosGradeLevel.MENTOR)
+            .order_by("first_name")
         )
 
     def get_context_data(self, **kwargs):
@@ -41,7 +43,9 @@ class GosStudentSummaryView(generic.ListView):
         plots = []
         plots.append(
             render_cumulative_hours_plot(
-                GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR),
+                GosStudent.objects.filter(inactive=False).exclude(
+                    grade=GosGradeLevel.MENTOR
+                ),
                 get_recommended_hour_lines(),
             )
         )
@@ -58,9 +62,9 @@ class GosMentorSummaryView(generic.ListView):
     ordering = ["first_name"]
 
     def get_queryset(self):
-        return GosStudent.objects.filter(grade=GosGradeLevel.MENTOR).order_by(
-            "first_name"
-        )
+        return GosStudent.objects.filter(
+            inactive=False, grade=GosGradeLevel.MENTOR
+        ).order_by("first_name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -69,7 +73,7 @@ class GosMentorSummaryView(generic.ListView):
         plots = []
         plots.append(
             render_cumulative_hours_plot(
-                GosStudent.objects.filter(grade=GosGradeLevel.MENTOR),
+                GosStudent.objects.filter(inactive=False, grade=GosGradeLevel.MENTOR),
                 get_recommended_hour_lines(),
             )
         )
@@ -83,7 +87,9 @@ class GosPresasonCrewDetail(generic.TemplateView):
     template_name = "attendance/gos/ftc_crew_detail.html"
 
     def get_context_data(self, crew):
-        students = GosStudent.objects.filter(preseason_crew=crew).order_by("first_name")
+        students = GosStudent.objects.filter(
+            inactive=False, preseason_crew=crew
+        ).order_by("first_name")
         context = get_navbar_context()
         context["crew_name"] = crew
         context["students"] = students
@@ -99,12 +105,12 @@ class GosPresasonCrewList(generic.TemplateView):
     def get_context_data(self):
         crews = {}
         for crew_name, _ in GosPreseasonCrew.choices:
-            students = GosStudent.objects.filter(preseason_crew=crew_name).order_by(
-                "first_name"
-            )
+            students = GosStudent.objects.filter(
+                inactive=False, preseason_crew=crew_name
+            ).order_by("first_name")
             crews[crew_name] = students
 
-        df = pd.DataFrame(list(GosStudent.objects.all().values()))
+        df = pd.DataFrame(list(GosStudent.objects.filter(inactive=False).values()))
 
         plots = []
         plots.append(
@@ -114,7 +120,10 @@ class GosPresasonCrewList(generic.TemplateView):
             render_box_and_whisker_plot(
                 df,
                 "preseason_crew",
-                [student.num_hours() for student in GosStudent.objects.all()],
+                [
+                    student.num_hours()
+                    for student in GosStudent.objects.filter(inactive=False)
+                ],
                 title="Crew Hours",
             )
         )
@@ -130,7 +139,7 @@ class GosBusinessSubteamDetail(generic.TemplateView):
 
     def get_context_data(self, business_subteam):
         students = GosStudent.objects.filter(
-            business_subteam=business_subteam
+            inactive=False, business_subteam=business_subteam
         ).order_by("first_name")
         context = get_navbar_context()
         context["business_subteam"] = business_subteam
@@ -149,12 +158,12 @@ class GosBusinessSubteamList(generic.TemplateView):
         for subteam_name, _ in GosBusinessSubteams.choices:
             print(subteam_name)
             students = GosStudent.objects.filter(
-                business_subteam=subteam_name
+                inactive=False, business_subteam=subteam_name
             ).order_by("first_name")
             print(students)
             subteams[subteam_name] = students
 
-        df = pd.DataFrame(list(GosStudent.objects.all().values()))
+        df = pd.DataFrame(list(GosStudent.objects.filter(inactive=False).values()))
 
         plots = []
         plots.append(
@@ -164,7 +173,10 @@ class GosBusinessSubteamList(generic.TemplateView):
             render_box_and_whisker_plot(
                 df,
                 "business_subteam",
-                [student.num_hours() for student in GosStudent.objects.all()],
+                [
+                    student.num_hours()
+                    for student in GosStudent.objects.filter(inactive=False)
+                ],
                 title="Subteam Hours",
             )
         )
@@ -179,7 +191,9 @@ class GosProgramDetail(generic.TemplateView):
     template_name = "attendance/gos/gos_program_detail.html"
 
     def get_context_data(self, program):
-        students = GosStudent.objects.filter(gos_program=program).order_by("first_name")
+        students = GosStudent.objects.filter(
+            inactive=False, gos_program=program
+        ).order_by("first_name")
         context = get_navbar_context()
         context["program_name"] = program
         context["students"] = students
@@ -196,12 +210,12 @@ class GosProgramList(generic.TemplateView):
     def get_context_data(self):
         programs = {}
         for program_name, _ in GosProgram.choices:
-            students = GosStudent.objects.filter(gos_program=program_name).order_by(
-                "first_name"
-            )
+            students = GosStudent.objects.filter(
+                inactive=False, gos_program=program_name
+            ).order_by("first_name")
             programs[program_name] = students
 
-        df = pd.DataFrame(list(GosStudent.objects.all().values()))
+        df = pd.DataFrame(list(GosStudent.objects.filter(inactive=False).values()))
         plots = []
         plots.append(
             render_count_pie_chart(df, "gos_program", "id", title="Program Sizes")
@@ -210,7 +224,10 @@ class GosProgramList(generic.TemplateView):
             render_box_and_whisker_plot(
                 df,
                 "gos_program",
-                [student.num_hours() for student in GosStudent.objects.all()],
+                [
+                    student.num_hours()
+                    for student in GosStudent.objects.filter(inactive=False)
+                ],
                 title="Program Hours",
             )
         )
@@ -240,17 +257,22 @@ class GosGradeYearList(generic.TemplateView):
     def get_context_data(self):
         grades = {}
         for grade, _ in GosGradeLevel.choices:
-            students = GosStudent.objects.filter(grade=grade).order_by("first_name")
+            students = GosStudent.objects.filter(inactive=False, grade=grade).order_by(
+                "first_name"
+            )
             grades[grade] = students
 
-        df = pd.DataFrame(list(GosStudent.objects.all().values()))
+        df = pd.DataFrame(list(GosStudent.objects.filter(inactive=False).values()))
         plots = []
         plots.append(render_count_pie_chart(df, "grade", "id", title="Grade Sizes"))
         plots.append(
             render_box_and_whisker_plot(
                 df,
                 "grade",
-                [student.num_hours() for student in GosStudent.objects.all()],
+                [
+                    student.num_hours()
+                    for student in GosStudent.objects.filter(inactive=False)
+                ],
                 title="Grade Hours",
             )
         )
@@ -264,7 +286,9 @@ class GosGradeYearDetail(generic.TemplateView):
     template_name = "attendance/gos/grade_year_detail.html"
 
     def get_context_data(self, grade_year):
-        students = GosStudent.objects.filter(grade=grade_year).order_by("first_name")
+        students = GosStudent.objects.filter(inactive=False, grade=grade_year).order_by(
+            "first_name"
+        )
 
         context = get_navbar_context()
         context["grade"] = grade_year
@@ -342,15 +366,15 @@ class GosSubteamList(generic.TemplateView):
     def get_context_data(self):
         subteams = {}
         for subteam_name, _ in GosSubteam.choices:
-            students = GosStudent.objects.filter(subteam=subteam_name)
+            students = GosStudent.objects.filter(inactive=False, subteam=subteam_name)
             subteams[subteam_name] = students
 
-        frc_students = GosStudent.objects.filter(gos_program="FRC").order_by(
-            "first_name"
-        )
-        ftc_students = GosStudent.objects.filter(gos_program="FTC").order_by(
-            "first_name"
-        )
+        frc_students = GosStudent.objects.filter(
+            inactive=False, gos_program="FRC"
+        ).order_by("first_name")
+        ftc_students = GosStudent.objects.filter(
+            inactive=False, gos_program="FTC"
+        ).order_by("first_name")
 
         frc_df = pd.DataFrame(list(frc_students.values()))
         ftc_df = pd.DataFrame(list(ftc_students.values()))
@@ -389,7 +413,9 @@ class GosSubteamDetail(generic.TemplateView):
     template_name = "attendance/gos/subteam_detail.html"
 
     def get_context_data(self, subteam):
-        students = GosStudent.objects.filter(subteam=subteam).order_by("first_name")
+        students = GosStudent.objects.filter(inactive=False, subteam=subteam).order_by(
+            "first_name"
+        )
         context = get_navbar_context()
         context["subteam"] = subteam
         context["students"] = students
