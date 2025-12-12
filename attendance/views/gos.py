@@ -392,9 +392,11 @@ class GosAttendanceReportView(generic.TemplateView):
     template_name = "attendance/gos/gos_attendance_report.html"
 
     def get(self, request, *args, **kwargs):
-        # Build report rows
-        students = GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR).order_by(
-            "first_name", "last_name"
+        # Build report rows (only active students, exclude mentors)
+        students = (
+            GosStudent.objects.filter(inactive=False)
+            .exclude(grade=GosGradeLevel.MENTOR)
+            .order_by("first_name", "last_name")
         )
         rows = []
         for s in students:
