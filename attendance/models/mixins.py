@@ -62,10 +62,10 @@ class InOutTimeMixin:
             else:
                 duration_str = self.get_last_login().get_duration_hm()
                 self._log_out()
-                
+
                 daily_total = self.num_hours_today_hm()
                 weekly_total = self.num_hours_this_week_hm()
-                
+
                 msg = (
                     f"{username} Logged out at {now_str} after {duration_str}<br>"
                     f"Daily total: {daily_total}<br>"

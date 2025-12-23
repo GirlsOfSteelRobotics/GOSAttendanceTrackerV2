@@ -96,9 +96,7 @@ class GosSigninWithRfidTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("gos_signin"))
-        self.assertIn(
-            "Test User2 Logged out at", self.client.session["result_msg"]
-        )
+        self.assertIn("Test User2 Logged out at", self.client.session["result_msg"])
         self.assertTrue(self.client.session["good_result"])
 
         self.assertEqual(1, len(student_ut.gosattendance_set.all()))
@@ -159,9 +157,7 @@ class GosSigninWithName(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("gos_signin"))
-        self.assertIn(
-            "Test User2 Logged out at", self.client.session["result_msg"]
-        )
+        self.assertIn("Test User2 Logged out at", self.client.session["result_msg"])
         self.assertTrue(self.client.session["good_result"])
 
         self.assertEqual(1, len(student_ut.gosattendance_set.all()))
