@@ -13,6 +13,11 @@ urlpatterns = [
     path("manifest/", top_level.ActiveManifest.as_view(), name="active_manifest"),
     # GOS
     path("gos/", gos.GosStudentSummaryView.as_view(), name="gos_student_summary"),
+    path(
+        "gos/report",
+        gos.GosAttendanceReportView.as_view(),
+        name="gos_attendance_report",
+    ),
     path("gos/mentors", gos.GosMentorSummaryView.as_view(), name="gos_mentor_summary"),
     path("gos/signin", gos.gos_signin, name="gos_signin"),
     path(
