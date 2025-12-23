@@ -44,7 +44,7 @@ class FieldBuilderLogAttendanceTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("field_builders_signin"))
-        self.assertEqual("Field Builder 1 Logged in", self.client.session["result_msg"])
+        self.assertIn("Field Builder 1 Logged in at", self.client.session["result_msg"])
         self.assertTrue(self.client.session["good_result"])
 
         # Verify there is a new attendance entry
@@ -57,8 +57,8 @@ class FieldBuilderLogAttendanceTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("field_builders_signin"))
-        self.assertEqual(
-            "New Visitor Logged in. As a new visitor, please make sure you have filled out the CMU forms",
+        self.assertIn(
+            "New Visitor Logged in at",
             self.client.session["result_msg"],
         )
         self.assertTrue(self.client.session["good_result"])

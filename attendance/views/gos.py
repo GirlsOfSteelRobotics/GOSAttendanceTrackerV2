@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
@@ -328,7 +328,11 @@ class GosGradeYearDetail(generic.TemplateView):
 
 
 def gos_signin(request):
-    return render(request, "attendance/gos/signin.html")
+    context = get_navbar_context()
+    # Pull message from session, then clear it so it doesn't persist
+    context["result_msg"] = request.session.pop("result_msg", None)
+    context["good_result"] = request.session.pop("good_result", False)
+    return render(request, "attendance/gos/signin.html", context)
 
 
 def gos_log_attendance_rfid(request):
@@ -388,18 +392,14 @@ def gos_log_attendance_name(request):
 def __login_failure_redirect(request, error_msg, template_name):
     request.session["result_msg"] = error_msg
     request.session["good_result"] = False
-    return render(
-        request,
-        template_name,
-        {"error_message_name": error_msg},
-    )
+    return redirect(reverse("gos_signin"))
 
 
 def __gos_handle_login(request, student):
     msg, good_result = student.handle_signin_attempt()
     request.session["result_msg"] = msg
     request.session["good_result"] = good_result
-    return HttpResponseRedirect(reverse("gos_signin"))
+    return redirect(reverse("gos_signin"))
 
 
 class GosAttendanceReportView(generic.TemplateView):
