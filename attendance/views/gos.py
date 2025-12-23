@@ -332,7 +332,14 @@ def gos_signin(request):
 
 
 def gos_log_attendance_rfid(request):
-    rfid = request.POST["rfid"]
+    # Use .get() to avoid MultiValueDictKeyError and validate input
+    rfid = request.POST.get("rfid")
+    if rfid is None or str(rfid).strip() == "":
+        return __login_failure_redirect(
+            request,
+            "Please tap your RFID keyfob or enter your RFID.",
+            "attendance/gos/signin.html",
+        )
     try:
         rfid = int(rfid)
     except ValueError:
@@ -350,7 +357,14 @@ def gos_log_attendance_rfid(request):
 
 
 def gos_log_attendance_name(request):
-    full_name = request.POST["full_name"].strip()
+    # Use .get() to avoid MultiValueDictKeyError when field is missing
+    full_name = (request.POST.get("full_name") or "").strip()
+    if not full_name:
+        return __login_failure_redirect(
+            request,
+            "Please enter your full name (first and last).",
+            "attendance/gos/signin.html",
+        )
     name_parts = full_name.split(" ")
     if len(name_parts) != 2:
         return __login_failure_redirect(
