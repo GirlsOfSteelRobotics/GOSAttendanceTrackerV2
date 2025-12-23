@@ -50,7 +50,7 @@ class GosStudentDetailTest(TestCase):
 class GosSigninWithRfidTest(TestCase):
     def test_empty_rfid(self):
         response = self.client.post(reverse("gos_log_attendance_rfid"), dict(rfid=""))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(
             "Please tap your RFID keyfob or enter your RFID.",
             self.client.session["result_msg"],
@@ -59,7 +59,7 @@ class GosSigninWithRfidTest(TestCase):
 
     def test_invalid_rfid(self):
         response = self.client.post(reverse("gos_log_attendance_rfid"), dict(rfid=191))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(
             "No student found with RFID 191", self.client.session["result_msg"]
         )
@@ -77,7 +77,7 @@ class GosSigninWithRfidTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("gos_signin"))
-        self.assertEqual("Test User1 Logged in", self.client.session["result_msg"])
+        self.assertIn("Test User1 Logged in at", self.client.session["result_msg"])
         self.assertTrue(self.client.session["good_result"])
 
         # Verify there is a new attendance entry
@@ -96,8 +96,8 @@ class GosSigninWithRfidTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("gos_signin"))
-        self.assertTrue(
-            "Test User2 Logged out after" in self.client.session["result_msg"]
+        self.assertIn(
+            "Test User2 Logged out at", self.client.session["result_msg"]
         )
         self.assertTrue(self.client.session["good_result"])
 
@@ -111,7 +111,7 @@ class GosSigninWithName(TestCase):
         response = self.client.post(
             reverse("gos_log_attendance_name"), dict(full_name="Prince")
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(
             "Invalid student name Prince, could not split the name into two parts",
             self.client.session["result_msg"],
@@ -122,7 +122,7 @@ class GosSigninWithName(TestCase):
         response = self.client.post(
             reverse("gos_log_attendance_name"), dict(full_name="Fake Student")
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(
             "Invalid student name Fake Student", self.client.session["result_msg"]
         )
@@ -140,7 +140,7 @@ class GosSigninWithName(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("gos_signin"))
-        self.assertEqual("Test User1 Logged in", self.client.session["result_msg"])
+        self.assertIn("Test User1 Logged in at", self.client.session["result_msg"])
         self.assertTrue(self.client.session["good_result"])
 
         # Verify there is a new attendance entry
@@ -159,8 +159,8 @@ class GosSigninWithName(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("gos_signin"))
-        self.assertTrue(
-            "Test User2 Logged out after" in self.client.session["result_msg"]
+        self.assertIn(
+            "Test User2 Logged out at", self.client.session["result_msg"]
         )
         self.assertTrue(self.client.session["good_result"])
 

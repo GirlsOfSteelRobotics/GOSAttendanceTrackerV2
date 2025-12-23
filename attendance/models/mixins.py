@@ -51,6 +51,8 @@ class InOutTimeMixin:
         good_result = False
 
         username = self._full_name()
+        now = timezone.now()
+        now_str = now.strftime("%I:%M %p")
 
         if self.is_logged_in():
             time_from_login = self.time_since_last_login()
@@ -58,10 +60,17 @@ class InOutTimeMixin:
             if time_from_login < datetime.timedelta(minutes=DEBOUNCE_TIME_MINUTES):
                 msg = f"{username} tapped twice in {time_from_login_sec} seconds, ignoring input. Please try again after {DEBOUNCE_TIME_MINUTES} minutes"
             else:
-                hours = time_from_login_sec // 3600
-                minutes = (time_from_login_sec % 3600) // 60
-                msg = f"{username} Logged out after {hours:02}:{minutes:02}."
+                duration_str = self.get_last_login().get_duration_hm()
                 self._log_out()
+                
+                daily_total = self.num_hours_today_hm()
+                weekly_total = self.num_hours_this_week_hm()
+                
+                msg = (
+                    f"{username} Logged out at {now_str} after {duration_str}<br>"
+                    f"Daily total: {daily_total}<br>"
+                    f"Weekly total (Sun-Sat): {weekly_total}"
+                )
                 good_result = True
         else:
             new_attendance = self._log_in()
@@ -71,10 +80,50 @@ class InOutTimeMixin:
                 sheets_backend = GoogleSheetsBackend()
                 sheets_backend.signin(new_attendance)
 
-            msg = f"{username} Logged in"
+            msg = f"{username} Logged in at {now_str}"
             good_result = True
 
         return msg, good_result
+
+    def num_hours_today_hm(self) -> str:
+        """Return total hours for the current calendar day as 'H hrs M min'."""
+        now = timezone.now()
+        start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        attendance_query = self._get_attendance_set().filter(time_in__gte=start_of_day)
+        total_delta = sum(
+            [x.get_duration() for x in attendance_query],
+            datetime.timedelta(),
+        )
+        total_seconds = int(total_delta.total_seconds())
+        if total_seconds < 0:
+            total_seconds = 0
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        return f"{hours} hrs {minutes} min"
+
+    def num_hours_this_week_hm(self) -> str:
+        """Return total hours for the current week (Sunday to Saturday) as 'H hrs M min'."""
+        now = timezone.now()
+        # weekday() returns 0 for Monday, 6 for Sunday.
+        # We want Sunday to be the start (0 or 7 depending on logic).
+        # In Python's weekday: Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
+        # If today is Sunday (6), we want days_since_sunday = 0
+        # If today is Monday (0), we want days_since_sunday = 1
+        days_since_sunday = (now.weekday() + 1) % 7
+        start_of_week = (now - datetime.timedelta(days=days_since_sunday)).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        attendance_query = self._get_attendance_set().filter(time_in__gte=start_of_week)
+        total_delta = sum(
+            [x.get_duration() for x in attendance_query],
+            datetime.timedelta(),
+        )
+        total_seconds = int(total_delta.total_seconds())
+        if total_seconds < 0:
+            total_seconds = 0
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        return f"{hours} hrs {minutes} min"
 
     def _attendance_filter(self):
         query_dict = get_filter_attendance_by_date_range_query()
