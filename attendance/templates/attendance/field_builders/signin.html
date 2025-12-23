@@ -11,9 +11,52 @@
     <script src="{% static 'attendance/redirect_to_gos_signin_on_idle.js' %}"></script>
     <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
     <link rel="stylesheet" href="{% static 'attendance/attendance.css' %}">
+    <style>
+        /* Simple full-screen dark overlay shown during lookup/save */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .d-none { display: none !important; }
+    </style>
 
     <script>
-setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 5000);
+window.addEventListener('DOMContentLoaded', function () {
+    // Toast notification initialization
+    var resultMsg = "{{ result_msg|safe }}";
+    if (resultMsg && resultMsg !== "None" && resultMsg !== "") {
+        var toastEl = document.getElementById('statusToast');
+        var toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+        toast.show();
+    }
+
+    function showLoadingAndDisable() {
+        try {
+            var nameInput = document.getElementById('full_name');
+            var submitBtn = document.querySelector('input[type="submit"]');
+            
+            if (nameInput) { nameInput.setAttribute('aria-busy', 'true'); nameInput.readOnly = true; }
+            if (submitBtn) { submitBtn.disabled = true; }
+        } catch (e) { /* no-op */ }
+        var overlay = document.getElementById('loadingOverlay');
+        if (overlay) { overlay.classList.remove('d-none'); }
+    }
+
+    var form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function () {
+            showLoadingAndDisable();
+        });
+    }
+});
     </script>
 </head>
 <body id="field">
@@ -56,13 +99,36 @@ setTimeout(function() {document.getElementById('status_msg').innerHTML='';}, 500
         <div class="col-md-2">
             <input type="submit" value="Sign In">
         </div>
+    </div>
 </form>
 
 <div class="row">
-    <p id="status_msg" style="{%  if request.session.good_result %}color: green {%  else %} color: red {% endif %}">{{ request.session.result_msg }}</p>
+    <div class="col-md-12">
+        <!-- Toast Container -->
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="statusToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header {% if good_result %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ result_msg|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 </div><!-- container //  -->
+
+<!-- Loading overlay -->
+<div id="loadingOverlay" class="loading-overlay d-none">
+    <div class="text-center text-light">
+        <div class="spinner-border" role="status" aria-hidden="true"></div>
+        <div class="mt-3 h4">Please wait...</div>
+        <div class="small">Looking up your name and saving the time</div>
+    </div>
+</div>
 
 </body>
 </html>
