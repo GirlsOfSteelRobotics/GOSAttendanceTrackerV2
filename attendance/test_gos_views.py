@@ -51,7 +51,10 @@ class GosSigninWithRfidTest(TestCase):
     def test_empty_rfid(self):
         response = self.client.post(reverse("gos_log_attendance_rfid"), dict(rfid=""))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual("Invalid rfid ''", self.client.session["result_msg"])
+        self.assertEqual(
+            "Please tap your RFID keyfob or enter your RFID.",
+            self.client.session["result_msg"],
+        )
         self.assertFalse(self.client.session["good_result"])
 
     def test_invalid_rfid(self):
