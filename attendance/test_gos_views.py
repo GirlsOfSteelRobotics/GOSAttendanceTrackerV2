@@ -49,7 +49,9 @@ class GosStudentDetailTest(TestCase):
 
 class GosSigninCombinedTest(TestCase):
     def test_empty_query(self):
-        response = self.client.post(reverse("gos_log_attendance"), dict(search_query=""))
+        response = self.client.post(
+            reverse("gos_log_attendance"), dict(search_query="")
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
             "Please tap your RFID keyfob or enter your full name.",
@@ -58,7 +60,9 @@ class GosSigninCombinedTest(TestCase):
         self.assertFalse(self.client.session["good_result"])
 
     def test_invalid_rfid(self):
-        response = self.client.post(reverse("gos_log_attendance"), dict(search_query="191"))
+        response = self.client.post(
+            reverse("gos_log_attendance"), dict(search_query="191")
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
             "No student found with RFID 191", self.client.session["result_msg"]
