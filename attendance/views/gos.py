@@ -335,45 +335,33 @@ def gos_signin(request):
     return render(request, "attendance/gos/signin.html", context)
 
 
-def gos_log_attendance_rfid(request):
-    # Use .get() to avoid MultiValueDictKeyError and validate input
-    rfid = request.POST.get("rfid")
-    if rfid is None or str(rfid).strip() == "":
+def gos_log_attendance(request):
+    search_query = (request.POST.get("search_query") or "").strip()
+    if not search_query:
         return __login_failure_redirect(
             request,
-            "Please tap your RFID keyfob or enter your RFID.",
+            "Please tap your RFID keyfob or enter your full name.",
             "attendance/gos/signin.html",
         )
-    try:
-        rfid = int(rfid)
-    except ValueError:
-        return __login_failure_redirect(
-            request, f"Invalid rfid '{rfid}'", "attendance/gos/signin.html"
-        )
 
-    students = GosStudent.objects.filter(rfid=rfid)
-    if not students:
-        return __login_failure_redirect(
-            request, f"No student found with RFID {rfid}", "attendance/gos/signin.html"
-        )
+    # Try to treat as RFID if it's all digits
+    if search_query.isdigit():
+        rfid = int(search_query)
+        students = GosStudent.objects.filter(rfid=rfid)
+        if not students:
+            return __login_failure_redirect(
+                request,
+                f"No student found with RFID {rfid}",
+                "attendance/gos/signin.html",
+            )
+        return __gos_handle_login(request, students[0])
 
-    return __gos_handle_login(request, students[0])
-
-
-def gos_log_attendance_name(request):
-    # Use .get() to avoid MultiValueDictKeyError when field is missing
-    full_name = (request.POST.get("full_name") or "").strip()
-    if not full_name:
-        return __login_failure_redirect(
-            request,
-            "Please enter your full name (first and last).",
-            "attendance/gos/signin.html",
-        )
-    name_parts = full_name.split(" ")
+    # Otherwise, treat as full name
+    name_parts = search_query.split(" ")
     if len(name_parts) != 2:
         return __login_failure_redirect(
             request,
-            f"Invalid student name {full_name}, could not split the name into two parts",
+            f"Invalid student name {search_query}, could not split the name into two parts (First Last)",
             "attendance/gos/signin.html",
         )
 
@@ -382,7 +370,7 @@ def gos_log_attendance_name(request):
     if not students:
         return __login_failure_redirect(
             request,
-            f"Invalid student name {full_name}",
+            f"Invalid student name {search_query}",
             "attendance/gos/signin.html",
         )
 

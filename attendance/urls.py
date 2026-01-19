@@ -21,14 +21,9 @@ urlpatterns = [
     path("gos/mentors", gos.GosMentorSummaryView.as_view(), name="gos_mentor_summary"),
     path("gos/signin", gos.gos_signin, name="gos_signin"),
     path(
-        "gos/log_attendance_rfid",
-        gos.gos_log_attendance_rfid,
-        name="gos_log_attendance_rfid",
-    ),
-    path(
-        "gos/log_attendance_name",
-        gos.gos_log_attendance_name,
-        name="gos_log_attendance_name",
+        "gos/log_attendance",
+        gos.gos_log_attendance,
+        name="gos_log_attendance",
     ),
     path(
         "gos/<int:rfid>/",
