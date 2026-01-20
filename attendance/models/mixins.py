@@ -89,11 +89,36 @@ class InOutTimeMixin:
         """Return total hours for the current calendar day as 'H hrs M min'."""
         now = timezone.now()
         start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        attendance_query = self._get_attendance_set().filter(time_in__gte=start_of_day)
-        total_delta = sum(
-            [x.get_duration() for x in attendance_query],
-            datetime.timedelta(),
+        # Include any session that was active today (started today OR ended today OR still open)
+        attendance_query = (
+            self._get_attendance_set()
+            .filter(
+                models.Q(time_in__gte=start_of_day)
+                | models.Q(time_out__gte=start_of_day)
+                | models.Q(time_out__isnull=True)
+            )
+            .distinct()
         )
+
+        total_delta = datetime.timedelta()
+        for x in attendance_query:
+            # If session is still open, check if it's "stale" (started > 18h ago)
+            # This matches the logic in is_logged_in()
+            is_stale = x.time_out is None and (now - x.time_in) > datetime.timedelta(
+                hours=18
+            )
+            if is_stale:
+                continue
+
+            # If session started before today, only count from start_of_day
+            effective_start = max(x.time_in, start_of_day)
+
+            out = x.time_out or now
+            effective_end = min(out, now)
+
+            if effective_end > effective_start:
+                total_delta += effective_end - effective_start
+
         total_seconds = int(total_delta.total_seconds())
         if total_seconds < 0:
             total_seconds = 0
@@ -113,11 +138,32 @@ class InOutTimeMixin:
         start_of_week = (now - datetime.timedelta(days=days_since_sunday)).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
-        attendance_query = self._get_attendance_set().filter(time_in__gte=start_of_week)
-        total_delta = sum(
-            [x.get_duration() for x in attendance_query],
-            datetime.timedelta(),
+        attendance_query = (
+            self._get_attendance_set()
+            .filter(
+                models.Q(time_in__gte=start_of_week)
+                | models.Q(time_out__gte=start_of_week)
+                | models.Q(time_out__isnull=True)
+            )
+            .distinct()
         )
+
+        total_delta = datetime.timedelta()
+        for x in attendance_query:
+            # Check for stale open sessions
+            is_stale = x.time_out is None and (now - x.time_in) > datetime.timedelta(
+                hours=18
+            )
+            if is_stale:
+                continue
+
+            effective_start = max(x.time_in, start_of_week)
+            out = x.time_out or now
+            effective_end = min(out, now)
+
+            if effective_end > effective_start:
+                total_delta += effective_end - effective_start
+
         total_seconds = int(total_delta.total_seconds())
         if total_seconds < 0:
             total_seconds = 0
@@ -185,7 +231,7 @@ class AttendanceMixin(models.Model):
     time_out = models.DateTimeField("Time Out", null=True)
 
     def get_duration(self):
-        out = self.time_out or self.time_in + datetime.timedelta(hours=0)
+        out = self.time_out or timezone.now()
         return out - self.time_in
 
     def get_duration_hm(self) -> str:
