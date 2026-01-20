@@ -37,6 +37,9 @@ class ScraSignin(generic.TemplateView):
 
         context = get_navbar_context()
         context["teams"] = teams_data
+        # Pull message from session, then clear it so it doesn't persist
+        context["result_msg"] = self.request.session.pop("result_msg", None)
+        context["good_result"] = self.request.session.pop("good_result", False)
         return context
 
 

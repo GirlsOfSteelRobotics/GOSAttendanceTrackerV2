@@ -37,6 +37,9 @@ class FieldBuildersSignin(generic.TemplateView):
     def get_context_data(self):
         context = {}
         context["field_builders"] = FieldBuilder.objects.all()
+        # Pull message from session, then clear it so it doesn't persist
+        context["result_msg"] = self.request.session.pop("result_msg", None)
+        context["good_result"] = self.request.session.pop("good_result", False)
         return context
 
 

@@ -27,39 +27,31 @@
         .d-none { display: none !important; }
     </style>
     <script>
-        // Clear any prior status message after a few seconds
+        // Wire up submit handlers to show loading state and disable inputs
         window.addEventListener('DOMContentLoaded', function () {
-            var statusEl = document.getElementById('status_msg');
-            if (statusEl) {
-                setTimeout(function () { statusEl.innerHTML = ''; }, 5000);
+            // Toast notification initialization
+            var resultMsg = "{{ result_msg|safe }}";
+            if (resultMsg && resultMsg !== "None" && resultMsg !== "") {
+                var toastEl = document.getElementById('statusToast');
+                var toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                toast.show();
             }
 
-            // Wire up submit handlers to show loading state and disable inputs
             function showLoadingAndDisable() {
                 try {
-                    var rfidInput = document.getElementById('rfid');
-                    var nameInput = document.getElementById('full_name');
-                    var rfidBtn = document.getElementById('rfid_submit');
-                    var nameBtn = document.getElementById('name_submit');
+                    var searchInput = document.getElementById('search_query');
+                    var submitBtn = document.getElementById('signin_submit');
                     // Use readOnly (not disabled) so values are still posted with the form
-                    if (rfidInput) { rfidInput.setAttribute('aria-busy', 'true'); rfidInput.readOnly = true; }
-                    if (nameInput) { nameInput.setAttribute('aria-busy', 'true'); nameInput.readOnly = true; }
-                    if (rfidBtn) { rfidBtn.disabled = true; }
-                    if (nameBtn) { nameBtn.disabled = true; }
+                    if (searchInput) { searchInput.setAttribute('aria-busy', 'true'); searchInput.readOnly = true; }
+                    if (submitBtn) { submitBtn.disabled = true; }
                 } catch (e) { /* no-op */ }
                 var overlay = document.getElementById('loadingOverlay');
                 if (overlay) { overlay.classList.remove('d-none'); }
             }
 
-            var rfidForm = document.getElementById('rfid_form');
-            if (rfidForm) {
-                rfidForm.addEventListener('submit', function () {
-                    showLoadingAndDisable();
-                });
-            }
-            var nameForm = document.getElementById('name_form');
-            if (nameForm) {
-                nameForm.addEventListener('submit', function () {
+            var signinForm = document.getElementById('signin_form');
+            if (signinForm) {
+                signinForm.addEventListener('submit', function () {
                     showLoadingAndDisable();
                 });
             }
@@ -86,44 +78,36 @@
         </div>
     </div>
 
-    <form id="rfid_form" class="row g-3" action="{% url 'gos_log_attendance_rfid' %}" method="post">
+    <form id="signin_form" class="row g-3" action="{% url 'gos_log_attendance' %}" method="post">
 {% csrf_token %}
     <div class="col-12">
-        <legend><h1>GoS - Tap your RFID keyfob</h1></legend>
+        <legend><h1>GoS - Tap RFID or Enter Full Name to Sign In</h1></legend>
     </div>
     <div class="col-md-2">
-        <label for="rfid" class="form-label">RFID</label>
+        <label for="search_query" class="form-label">RFID or Full Name</label>
     </div>
     <div class="col-md-8">
-        <input type="number" id="rfid" name="rfid" class="form-control" autofocus="autofocus" autocomplete="off" aria-autocomplete="none">
+        <input id="search_query" name="search_query" class="form-control" autofocus="autofocus" autocomplete="off" aria-autocomplete="none">
     </div>
     <div class="col-md-2">
-        <input id="rfid_submit" type="submit" value="Sign In" class="btn btn-primary">
+        <input id="signin_submit" type="submit" value="Sign In" class="btn btn-primary">
     </div>
-</form>
-
-<br><br>
-
-<form id="name_form" class="row g-3" action="{% url 'gos_log_attendance_name' %}" method="post">
-{% csrf_token %}
-    <div class="col-12">
-        <legend><h1>GoS - Sign In with Full Name</h1></legend>
-    </div>
-    <div class="col-md-2">
-        <label for="full_name" class="form-label">Full Name</label>
-    </div>
-    <div class="col-md-8">
-        <input id="full_name" name="full_name" class="form-control" autocomplete="off" aria-autocomplete="none">
-    </div>
-    <div class="col-md-2">
-        <input id="name_submit" type="submit" value="Sign In" class="btn btn-primary">
-    </div>
-
 </form>
 
 <div class="row">
     <div class="col-md-12">
-        <div id="status_msg" style="{%  if request.session.good_result %}color: green;{%  else %}color: red;{% endif %}">{{ request.session.result_msg }}</div>
+        <!-- Toast Container -->
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div id="statusToast" class="toast {% if good_result %}bg-success{% else %}bg-danger{% endif %} text-white" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header {% if good_result %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ result_msg|safe }}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
