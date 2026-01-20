@@ -51,7 +51,7 @@ class InOutTimeMixin:
         good_result = False
 
         username = self._full_name()
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         now_str = now.strftime("%I:%M %p")
 
         if self.is_logged_in():
