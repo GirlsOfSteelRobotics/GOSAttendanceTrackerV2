@@ -138,7 +138,13 @@ class GosPresasonCrewList(generic.TemplateView):
             ).order_by("first_name")
             crews[crew_name] = students
 
-        df = pd.DataFrame(list(GosStudent.objects.filter(inactive=False).exclude(grade=GosGradeLevel.MENTOR).values()))
+        df = pd.DataFrame(
+            list(
+                GosStudent.objects.filter(inactive=False)
+                .exclude(grade=GosGradeLevel.MENTOR)
+                .values()
+            )
+        )
 
         plots = []
         plots.append(
@@ -150,7 +156,9 @@ class GosPresasonCrewList(generic.TemplateView):
                 "preseason_crew",
                 [
                     student.num_hours()
-                    for student in GosStudent.objects.filter(inactive=False).exclude(grade=GosGradeLevel.MENTOR)
+                    for student in GosStudent.objects.filter(inactive=False).exclude(
+                        grade=GosGradeLevel.MENTOR
+                    )
                 ],
                 title="Crew Hours",
             )
@@ -184,12 +192,20 @@ class GosBusinessSubteamList(generic.TemplateView):
     def get_context_data(self):
         subteams = {}
         for subteam_name, _ in GosBusinessSubteams.choices:
-            students = GosStudent.objects.filter(
-                inactive=False, business_subteam=subteam_name
-            ).exclude(grade=GosGradeLevel.MENTOR).order_by("first_name")
+            students = (
+                GosStudent.objects.filter(inactive=False, business_subteam=subteam_name)
+                .exclude(grade=GosGradeLevel.MENTOR)
+                .order_by("first_name")
+            )
             subteams[subteam_name] = students
 
-        df = pd.DataFrame(list(GosStudent.objects.filter(inactive=False).exclude(grade=GosGradeLevel.MENTOR).values()))
+        df = pd.DataFrame(
+            list(
+                GosStudent.objects.filter(inactive=False)
+                .exclude(grade=GosGradeLevel.MENTOR)
+                .values()
+            )
+        )
 
         plots = []
         plots.append(
@@ -201,7 +217,9 @@ class GosBusinessSubteamList(generic.TemplateView):
                 "business_subteam",
                 [
                     student.num_hours()
-                    for student in GosStudent.objects.filter(inactive=False).exclude(grade=GosGradeLevel.MENTOR)
+                    for student in GosStudent.objects.filter(inactive=False).exclude(
+                        grade=GosGradeLevel.MENTOR
+                    )
                 ],
                 title="Subteam Hours",
             )
@@ -236,12 +254,20 @@ class GosProgramList(generic.TemplateView):
     def get_context_data(self):
         programs = {}
         for program_name, _ in GosProgram.choices:
-            students = GosStudent.objects.filter(
-                inactive=False, gos_program=program_name
-            ).exclude(grade=GosGradeLevel.MENTOR).order_by("first_name")
+            students = (
+                GosStudent.objects.filter(inactive=False, gos_program=program_name)
+                .exclude(grade=GosGradeLevel.MENTOR)
+                .order_by("first_name")
+            )
             programs[program_name] = students
 
-        df = pd.DataFrame(list(GosStudent.objects.filter(inactive=False).exclude(grade=GosGradeLevel.MENTOR).values()))
+        df = pd.DataFrame(
+            list(
+                GosStudent.objects.filter(inactive=False)
+                .exclude(grade=GosGradeLevel.MENTOR)
+                .values()
+            )
+        )
         plots = []
         plots.append(
             render_count_pie_chart(df, "gos_program", "id", title="Program Sizes")
@@ -252,7 +278,9 @@ class GosProgramList(generic.TemplateView):
                 "gos_program",
                 [
                     student.num_hours()
-                    for student in GosStudent.objects.filter(inactive=False).exclude(grade=GosGradeLevel.MENTOR)
+                    for student in GosStudent.objects.filter(inactive=False).exclude(
+                        grade=GosGradeLevel.MENTOR
+                    )
                 ],
                 title="Program Hours",
             )
@@ -283,12 +311,20 @@ class GosGradeYearList(generic.TemplateView):
     def get_context_data(self):
         grades = {}
         for grade, _ in GosGradeLevel.choices:
-            students = GosStudent.objects.filter(inactive=False, grade=grade).exclude(grade=GosGradeLevel.MENTOR).order_by(
-                "first_name"
+            students = (
+                GosStudent.objects.filter(inactive=False, grade=grade)
+                .exclude(grade=GosGradeLevel.MENTOR)
+                .order_by("first_name")
             )
             grades[grade] = students
 
-        df = pd.DataFrame(list(GosStudent.objects.filter(inactive=False).exclude(grade=GosGradeLevel.MENTOR).values()))
+        df = pd.DataFrame(
+            list(
+                GosStudent.objects.filter(inactive=False)
+                .exclude(grade=GosGradeLevel.MENTOR)
+                .values()
+            )
+        )
         plots = []
         plots.append(render_count_pie_chart(df, "grade", "id", title="Grade Sizes"))
         plots.append(
@@ -297,7 +333,9 @@ class GosGradeYearList(generic.TemplateView):
                 "grade",
                 [
                     student.num_hours()
-                    for student in GosStudent.objects.filter(inactive=False).exclude(grade=GosGradeLevel.MENTOR)
+                    for student in GosStudent.objects.filter(inactive=False).exclude(
+                        grade=GosGradeLevel.MENTOR
+                    )
                 ],
                 title="Grade Hours",
             )
@@ -455,15 +493,21 @@ class GosSubteamList(generic.TemplateView):
     def get_context_data(self):
         subteams = {}
         for subteam_name, _ in GosSubteam.choices:
-            students = GosStudent.objects.filter(inactive=False, subteam=subteam_name).exclude(grade=GosGradeLevel.MENTOR)
+            students = GosStudent.objects.filter(
+                inactive=False, subteam=subteam_name
+            ).exclude(grade=GosGradeLevel.MENTOR)
             subteams[subteam_name] = students
 
-        frc_students = GosStudent.objects.filter(
-            inactive=False, gos_program="FRC"
-        ).exclude(grade=GosGradeLevel.MENTOR).order_by("first_name")
-        ftc_students = GosStudent.objects.filter(
-            inactive=False, gos_program="FTC"
-        ).exclude(grade=GosGradeLevel.MENTOR).order_by("first_name")
+        frc_students = (
+            GosStudent.objects.filter(inactive=False, gos_program="FRC")
+            .exclude(grade=GosGradeLevel.MENTOR)
+            .order_by("first_name")
+        )
+        ftc_students = (
+            GosStudent.objects.filter(inactive=False, gos_program="FTC")
+            .exclude(grade=GosGradeLevel.MENTOR)
+            .order_by("first_name")
+        )
 
         frc_df = pd.DataFrame(list(frc_students.values()))
         ftc_df = pd.DataFrame(list(ftc_students.values()))
