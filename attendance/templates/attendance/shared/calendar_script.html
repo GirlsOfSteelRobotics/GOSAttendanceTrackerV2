@@ -37,7 +37,11 @@
             {% localtime on %}
             {%  for att in events %}
                {
+               {% if use_event_title %}
+                 title: "{{ att.title }} X{{use_signin_time}}Y",
+               {% else %}
                  title: "{{ att.time_in|date:'g:i a' }}{% if att.time_out %} - {{ att.time_out|date:'g:i a' }}{% endif %}",
+             {% endif %}
                  extendedProps: { duration: "{{ att.get_duration_hm }}" },
                 {% if att.show_as_all_day %}
                  allDay: true,

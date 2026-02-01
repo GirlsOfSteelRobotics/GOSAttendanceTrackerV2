@@ -1,12 +1,13 @@
 import pandas as pd
 
 from typing import Optional
-from attendance.models import GosStudent
+from attendance.models import GosStudent, GosGradeLevel
 
 
 def import_metadata():
     import_business_subteams()
     import_preseason_crews()
+    import_frc_subteams()
 
 
 def _lookup_student(row) -> Optional[GosStudent]:
@@ -50,3 +51,25 @@ def import_preseason_crews():
         if student:
             student.preseason_crew = team
             student.save()
+
+def import_frc_subteams():
+    filepath = r"attendance\tools\frc_subteams.csv"
+
+    frc_student_pks = set()
+
+    contents = pd.read_csv(filepath)
+    for index, row in contents.iterrows():
+        team = row["Team"]
+        student = _lookup_student(row)
+
+        if student:
+            student.subteam = team
+            student.gos_program = "FRC"
+            frc_student_pks.add(student.id)
+            student.save()
+
+    # Students not in that list are assumed to be on FTC
+    ftc_students = GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR).exclude(id__in=frc_student_pks).exclude(inactive=True)
+    for student in ftc_students:
+        student.gos_program = "FTC"
+        student.save()
