@@ -40,7 +40,9 @@ class IndexView(generic.TemplateView):
             )
             calendar_events.extend(
                 create_calendar_events_from_attendance(
-                    GosAttendance.objects.filter(student__gos_program="UNASSIGNED").exclude(student__grade=GosGradeLevel.MENTOR),
+                    GosAttendance.objects.filter(
+                        student__gos_program="UNASSIGNED"
+                    ).exclude(student__grade=GosGradeLevel.MENTOR),
                     "GOS Unassigned",
                     "gray",
                 )

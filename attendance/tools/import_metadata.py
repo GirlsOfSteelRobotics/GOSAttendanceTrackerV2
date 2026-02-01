@@ -52,6 +52,7 @@ def import_preseason_crews():
             student.preseason_crew = team
             student.save()
 
+
 def import_frc_subteams():
     filepath = r"attendance\tools\frc_subteams.csv"
 
@@ -69,7 +70,11 @@ def import_frc_subteams():
             student.save()
 
     # Students not in that list are assumed to be on FTC
-    ftc_students = GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR).exclude(id__in=frc_student_pks).exclude(inactive=True)
+    ftc_students = (
+        GosStudent.objects.exclude(grade=GosGradeLevel.MENTOR)
+        .exclude(id__in=frc_student_pks)
+        .exclude(inactive=True)
+    )
     for student in ftc_students:
         student.gos_program = "FTC"
         student.save()
