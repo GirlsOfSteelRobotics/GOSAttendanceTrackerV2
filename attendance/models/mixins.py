@@ -183,7 +183,7 @@ class InOutTimeMixin:
     def num_hours(self):
         attendance_query = self._attendance_filter()
         total_time = sum(
-            [x.get_duration() for x in attendance_query],
+            [x.get_duration() for x in attendance_query if x.time_out is not None],
             datetime.timedelta(),
         )
         return total_time.total_seconds() / 3600
@@ -192,7 +192,7 @@ class InOutTimeMixin:
         """Return total hours as 'H hrs M min' for the filtered attendance range."""
         attendance_query = self._attendance_filter()
         total_delta = sum(
-            [x.get_duration() for x in attendance_query],
+            [x.get_duration() for x in attendance_query if x.time_out is not None],
             datetime.timedelta(),
         )
         total_seconds = int(total_delta.total_seconds())
