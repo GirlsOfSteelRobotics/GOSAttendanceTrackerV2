@@ -7,6 +7,16 @@ from attendance.models.mixins import InOutTimeMixin, AttendanceMixin
 class GosSubteam2026(models.TextChoices):
     UNASSIGNED = "UNASSIGNED"
 
+    Design = "Design"
+    Mechanical = "Mechanical"
+    Electrical = "Electrical"
+    Software = "Software"
+    DataScience = "Data Science"
+
+    FtcHypatia = "FTC Hypatia"
+    FtcHopper = "FTC Hopper"
+    FtcLovelace = "FTC Lovelace"
+
 
 class GosBusinessTeam2026(models.TextChoices):
     UNASSIGNED = "UNASSIGNED"
