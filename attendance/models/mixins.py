@@ -231,8 +231,9 @@ class AttendanceMixin(models.Model):
     time_out = models.DateTimeField("Time Out", null=True)
 
     def get_duration(self):
-        out = self.time_out or timezone.now()
-        return out - self.time_in
+        if self.time_out is None:
+            return datetime.timedelta()
+        return self.time_out - self.time_in
 
     def get_duration_hm(self) -> str:
         """Return duration as 'H hrs M min' without seconds."""
