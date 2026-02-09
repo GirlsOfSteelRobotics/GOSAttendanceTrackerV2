@@ -10,7 +10,7 @@
     <script src="{% static 'attendance/navbar.js' %}"></script>
     <link rel="stylesheet" href="{% static 'attendance/navbar.css' %}">
     <link rel="stylesheet" href="{% static 'attendance/attendance.css' %}">
-{% include "attendance/shared/calendar_script.html" with events=calendar_events %}
+{% include "attendance/shared/calendar_script.html" with events=calendar_events use_event_title=True %}
 </head>
 <body>
 

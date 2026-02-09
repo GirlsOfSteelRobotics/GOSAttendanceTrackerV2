@@ -21,7 +21,7 @@ class IndexView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         calendar_events = []
 
-        GOS_PROGRAMS_DEFINED = False
+        GOS_PROGRAMS_DEFINED = True
 
         if GOS_PROGRAMS_DEFINED:
             calendar_events.extend(
@@ -40,16 +40,25 @@ class IndexView(generic.TemplateView):
             )
             calendar_events.extend(
                 create_calendar_events_from_attendance(
-                    GosAttendance.objects.filter(student__gos_program="UNASSIGNED"),
+                    GosAttendance.objects.filter(
+                        student__gos_program="UNASSIGNED"
+                    ).exclude(student__grade=GosGradeLevel.MENTOR),
                     "GOS Unassigned",
                     "gray",
+                )
+            )
+            calendar_events.extend(
+                create_calendar_events_from_attendance(
+                    GosAttendance.objects.filter(student__grade=GosGradeLevel.MENTOR),
+                    "GOS Mentors",
+                    "green",
                 )
             )
         else:
             calendar_events.extend(
                 create_calendar_events_from_attendance(
                     GosAttendance.objects.exclude(student__grade=GosGradeLevel.MENTOR),
-                    "GOS Mentors",
+                    "GOS Students",
                     "blue",
                 )
             )
@@ -69,7 +78,7 @@ class IndexView(generic.TemplateView):
 
         calendar_events.extend(
             create_calendar_events_from_attendance(
-                FieldBuilderAttendance.objects.all(), "Field Builders", "green"
+                FieldBuilderAttendance.objects.all(), "Field Builders", "purple"
             )
         )
 
