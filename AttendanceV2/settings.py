@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 import dj_database_url
 from pathlib import Path
 
@@ -125,3 +126,11 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# GOS Admin Portal API settings
+if DEBUG:
+    GOS_ADMIN_API_URL = "http://localhost:8000/api/v1"
+else:
+    GOS_ADMIN_API_URL = os.environ.get("GOS_ADMIN_API_URL")
+GOS_ADMIN_API_KEY = os.environ.get("GOS_ADMIN_API_KEY", "your-api-key-here")
+GOS_ADMIN_PROGRAM_ID = os.environ.get("GOS_ADMIN_PROGRAM_ID", 1)

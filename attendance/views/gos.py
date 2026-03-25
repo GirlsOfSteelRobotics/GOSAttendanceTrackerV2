@@ -20,6 +20,11 @@ from attendance.views.plotting_utils import (
     render_hours_scatter,
 )
 from attendance.views.utils import get_navbar_context, get_recommended_hour_lines
+from attendance.api_client import (
+    record_tap_api,
+    lookup_student_api,
+    get_program_report_api,
+)
 import pandas as pd
 
 
@@ -383,14 +388,30 @@ def gos_log_attendance(request):
     # Try to treat as RFID if it's all digits
     if search_query.isdigit():
         rfid = int(search_query)
-        students = GosStudent.objects.filter(rfid=rfid)
-        if not students:
+        # Attempt API record
+        res = record_tap_api(rfid_uid=rfid)
+        if "error" in res:
             return __login_failure_redirect(
                 request,
-                f"No student found with RFID {rfid}",
+                f"Error recording attendance via API: {res['error']}",
                 "attendance/gos/signin.html",
             )
-        return __gos_handle_login(request, students[0])
+
+        # Determine msg based on API response
+        # Note: the gos_admin_portal API response format: {"id": evt.id, "event_type": evt.event_type, ...}
+        # GOSAttendanceTrackerV2 usually shows "Welcome [Name]" or "Goodbye [Name]"
+
+        # Let's try to get the student name from the API too (maybe lookup first?)
+        lookup = lookup_student_api(rfid=rfid)
+        name = "Unknown"
+        if "students" in lookup and len(lookup["students"]) > 0:
+            name = lookup["students"][0]["name"]
+
+        action = "Welcome" if res.get("event_type") == "IN" else "Goodbye"
+        msg = f"{action}, {name}!"
+        request.session["result_msg"] = msg
+        request.session["good_result"] = True
+        return redirect(reverse("gos_signin"))
 
     # Otherwise, treat as full name
     name_parts = search_query.split(" ")
@@ -401,16 +422,38 @@ def gos_log_attendance(request):
             "attendance/gos/signin.html",
         )
 
-    first_name, last_name = name_parts
-    students = GosStudent.objects.filter(first_name=first_name, last_name=last_name)
-    if not students:
+    # Lookup student by name via API
+    lookup = lookup_student_api(name=search_query)
+    if "students" not in lookup or len(lookup["students"]) == 0:
         return __login_failure_redirect(
             request,
-            f"Invalid student name {search_query}",
+            f"No student found with name {search_query} via API",
             "attendance/gos/signin.html",
         )
 
-    return __gos_handle_login(request, students[0])
+    # Use first student found for now
+    student_id = lookup["students"][0]["id"]
+    name = lookup["students"][0]["name"]
+
+    # We'll use a visitor_name fallback if it's not a real student or use our student lookup result
+    # Actually the API attendance_tap expects rfid_uid or visitor_name.
+    # Let's use visitor_name as a placeholder if we have the full name.
+    # OR we should enhance the API to take student_id.
+
+    # For now, use the full name as visitor_name if it was a manual entry
+    res = record_tap_api(name=search_query)
+    if "error" in res:
+        return __login_failure_redirect(
+            request,
+            f"Error recording attendance via API: {res['error']}",
+            "attendance/gos/signin.html",
+        )
+
+    action = "Welcome" if res.get("event_type") == "IN" else "Goodbye"
+    msg = f"{action}, {name}!"
+    request.session["result_msg"] = msg
+    request.session["good_result"] = True
+    return redirect(reverse("gos_signin"))
 
 
 def __login_failure_redirect(request, error_msg, template_name):
@@ -430,35 +473,17 @@ class GosAttendanceReportView(generic.TemplateView):
     template_name = "attendance/gos/gos_attendance_report.html"
 
     def get(self, request, *args, **kwargs):
-        # Build report rows (only active students, exclude mentors)
-        students = (
-            GosStudent.objects.filter(inactive=False)
-            .exclude(grade=GosGradeLevel.MENTOR)
-            .order_by("first_name", "last_name")
-        )
-        rows = []
-        for s in students:
-            attendance_qs = s._attendance_filter()
-            # Count distinct days from time_in
-            unique_days = set([a.time_in.date() for a in attendance_qs])
-            rows.append(
-                {
-                    "name": (
-                        s.full_name()
-                        if hasattr(s, "full_name")
-                        else f"{s.first_name} {s.last_name}"
-                    ),
-                    "grade": (
-                        s.get_grade_display()
-                        if hasattr(s, "get_grade_display")
-                        else s.grade
-                    ),
-                    "total_hours": (
-                        round(s.num_hours(), 2) if hasattr(s, "num_hours") else 0
-                    ),
-                    "days_checked_in": len(unique_days),
-                }
+        # Pull report data via API
+        data = get_program_report_api()
+        if "error" in data:
+            return HttpResponse(
+                f"Error fetching report via API: {data['error']}", status=500
             )
+
+        rows = data.get("rows", [])
+
+        # Format for template (capitalize headers if needed, but rows usually have the fields)
+        # rows look like: {"student_id": 1, "name": "...", "total_hours": 1.5, "days_checked_in": 2}
 
         # CSV export
         if request.GET.get("format") == "csv":
